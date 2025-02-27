@@ -4,18 +4,31 @@ require 'db.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
     $transaction_type = $_POST['transaction_type'];
 
-    // Get queue number
-    $sql = "SELECT MAX(queue_number) AS last_queue FROM queue";
+    // Get the last queue number for the selected transaction type
+    $sql = "SELECT queue_number FROM queue WHERE transaction_type = '$transaction_type' ORDER BY id DESC LIMIT 1";
     $result = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($result);
-    $new_queue_number = $row['last_queue'] ? $row['last_queue'] + 1 : 1;
 
-    // Insert new queue number for user 
+    // Extract the number from the last queue number
+    if ($row) {
+        preg_match('/\d+/', $row['queue_number'], $matches);
+        $last_queue_number = $matches[0];
+        $new_queue_number = $last_queue_number + 1;
+    } else {
+        $new_queue_number = 1; // Start from 1 if no previous queue
+    }
+
+    // Add prefix based on transaction type
+    $prefix = ($transaction_type == 'deposit') ? 'D-' : (($transaction_type == 'withdrawal') ? 'W-' : 'O-');
+    $formatted_queue_number = $prefix . $new_queue_number;
+
+    // Insert into queue table
     $sql = "INSERT INTO queue (transaction_type, queue_number, status) 
-            VALUES ('$transaction_type', '$new_queue_number', 'waiting')";
+            VALUES ('$transaction_type', '$formatted_queue_number', 'waiting')";
     mysqli_query($conn, $sql);
 }
 
+// Get the latest queue number for display
 $sql = "SELECT queue_number, status FROM queue WHERE status != 'done' ORDER BY created_at DESC LIMIT 1";
 $result = mysqli_query($conn, $sql);
 $user_queue = mysqli_fetch_assoc($result);
@@ -23,7 +36,6 @@ $user_queue = mysqli_fetch_assoc($result);
 mysqli_close($conn);
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,10 +51,10 @@ mysqli_close($conn);
 
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
-             <div class="card shadow-lg mt-4" style="max-width: 400px; margin: 0 auto;">
-                <div class="card-header" style="background-color: #433878; color: white; text-align: center;">
-                    <h5>Generate Queue Number</h5>
-                </div>
+                <div class="card shadow-lg mt-4" style="max-width: 400px; margin: 0 auto;">
+                    <div class="card-header" style="background-color: #433878; color: white; text-align: center;">
+                        <h5>Generate Queue Number</h5>
+                    </div>
 
                     <div class="card-body text-center">
                         <form method="POST">
@@ -58,16 +70,14 @@ mysqli_close($conn);
                         <h5>Your Queue Status</h5>
                     </div>
                     <div class="card-body text-center">
-                    <?php if ($user_queue && $user_queue['status'] != 'done'): ?>
-    <p>Your Queue Number:</p>
-    <h1 style="font-size: 13rem; font-weight: bold;"><?php echo $user_queue['queue_number']; ?></h1>
-    <p>Status: <strong><?php echo ucfirst($user_queue['status']); ?></strong></p>
-<?php else: ?>
-    <p class="alert alert-secondary">You have not joined the queue yet.</p>
-<?php endif; ?>
-
+                        <?php if ($user_queue && $user_queue['status'] != 'done'): ?>
+                            <p>Your Queue Number:</p>
+                            <h1 style="font-size: 8rem; font-weight: bold;"><?php echo $user_queue['queue_number']; ?></h1>
+                            <p>Status: <strong><?php echo ucfirst($user_queue['status']); ?></strong></p>
+                        <?php else: ?>
+                            <p class="alert alert-secondary">You have not joined the queue yet.</p>
+                        <?php endif; ?>
                     </div>
-
                 </div>
 
                 <div class="text-center mt-3">

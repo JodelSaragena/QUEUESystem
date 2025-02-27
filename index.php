@@ -36,6 +36,11 @@
             width: 100%; 
             border-radius: 50px;
         }
+        .btn-get-number:hover {
+            background-color: #7E60BF; 
+            transform: scale(1.05); 
+            cursor: pointer; 
+        }
 
         .card {
             border-radius: 40px;

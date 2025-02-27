@@ -42,3 +42,12 @@ VALUES ('admin', PASSWORD('admin'), 'admin');
 -- Insert the Teller account (with password 'teller')
 INSERT INTO tellers (username, password, role) 
 VALUES ('teller', PASSWORD('teller'), 'teller');
+
+
+
+
+
+ALTER TABLE queue ADD COLUMN transaction_type ENUM('deposit', 'withdraw', 'open_account') NOT NULL;
+
+
+ALTER TABLE queue AUTO_INCREMENT = 100;
