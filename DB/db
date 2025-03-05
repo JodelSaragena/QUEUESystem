@@ -2,7 +2,6 @@
 CREATE DATABASE queueing;
 USE queueing;
 
--- 1. Create tellers table
 CREATE TABLE tellers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
@@ -10,8 +9,7 @@ CREATE TABLE tellers (
     role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
-s
--- 2. Create queue table (no user_id, use NULL for userless entries)
+
 CREATE TABLE queue (
     id INT AUTO_INCREMENT PRIMARY KEY,
     queue_number VARCHAR(10) NOT NULL UNIQUE,  -- Supports formatted numbers like D1, W1, A1
@@ -35,14 +33,8 @@ CREATE TABLE queue (
 INSERT INTO tellers (username, password, role) 
 VALUES ('admin', PASSWORD('admin'), 'admin');
 
-
-
 ALTER TABLE queue AUTO_INCREMENT = 100;
-
-
-ALTER TABLE tellers 
-MODIFY role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
-
+ 
 INSERT INTO tellers (username, password, role) VALUES  
 ('tellerwithdraw', 'password123', 'tellerwithdraw'), 
 ('tellerdeposit', 'password123', 'tellerdeposit'), 
