@@ -5,7 +5,7 @@ USE queueing;
 CREATE TABLE tellers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,  -- Store hashed passwords
+    password VARCHAR(255) NOT NULL, 
     role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -25,7 +25,7 @@ CREATE TABLE queue (
     transaction_type ENUM('deposit', 'withdrawal', 'open_account') NOT NULL,
     status ENUM('waiting', 'serving', 'done') DEFAULT 'waiting',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
 ) ENGINE=InnoDB;
 
 

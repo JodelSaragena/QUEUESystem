@@ -1,5 +1,4 @@
 <?php
-
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
@@ -10,18 +9,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
         $transaction_type = "open_account"; 
     }
 
-    // Assign prefix 
+    // prefix 
     $prefix = ($transaction_type == "deposit") ? "D-" :
               (($transaction_type == "withdrawal") ? "W-" : "A-");
 
-    // Get the last queue number for the specific transaction type
+    // Get the last queue number /specific transaction type
     $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE transaction_type = ? ORDER BY id DESC LIMIT 1");
     $stmt->bind_param("s", $transaction_type);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
 
-    // Initialize queue number
+    // In. queue number
     $new_queue_number = 1;
 
     if ($row) {

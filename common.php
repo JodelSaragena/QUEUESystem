@@ -1,6 +1,5 @@
 <?php
 require 'db.php';
-
 // Get the currently serving numbers categorized by transaction type
 $transaction_types = ['withdrawal', 'deposit', 'open_account'];
 $serving_numbers = [];
