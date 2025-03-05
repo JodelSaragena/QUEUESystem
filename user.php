@@ -1,31 +1,68 @@
 <?php
+
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
     $transaction_type = $_POST['transaction_type'];
 
-    // Get the last queue number for the selected transaction type
-    $sql = "SELECT queue_number FROM queue WHERE transaction_type = '$transaction_type' ORDER BY id DESC LIMIT 1";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
 
-    // Extract the number from the last queue number
-    if ($row) {
-        preg_match('/\d+/', $row['queue_number'], $matches);
-        $last_queue_number = $matches[0];
-        $new_queue_number = $last_queue_number + 1;
-    } else {
-        $new_queue_number = 1; // Start from 1 if no previous queue
+    if ($transaction_type == "account opening") {
+        $transaction_type = "open_account"; 
     }
 
-    // Add prefix based on transaction type
-    $prefix = ($transaction_type == 'deposit') ? 'D-' : (($transaction_type == 'withdrawal') ? 'W-' : 'O-');
+    // Assign prefix 
+    $prefix = ($transaction_type == "deposit") ? "D-" :
+              (($transaction_type == "withdrawal") ? "W-" : "A-");
+
+    // Get the last queue number for the specific transaction type
+    $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE transaction_type = ? ORDER BY id DESC LIMIT 1");
+    $stmt->bind_param("s", $transaction_type);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    // Initialize queue number
+    $new_queue_number = 1;
+
+    if ($row) {
+        // Extract the numeric part of the last queue number ( A5 → 5)
+        preg_match('/(\d+)$/', $row['queue_number'], $matches);
+        if (isset($matches[1])) {
+            $new_queue_number = (int)$matches[1] + 1;
+        }
+    }
+
+    // Format queue number (D1, W2, A3)
     $formatted_queue_number = $prefix . $new_queue_number;
 
+    // Check if the generated queue number already exists (extra safety)
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM queue WHERE queue_number = ?");
+    $stmt->bind_param("s", $formatted_queue_number);
+    $stmt->execute();
+    $stmt->bind_result($count);
+    $stmt->fetch();
+    $stmt->close();
+
+    // If duplicate check again
+    while ($count > 0) {
+        $new_queue_number++;
+        $formatted_queue_number = $prefix . $new_queue_number;
+
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM queue WHERE queue_number = ?");
+        $stmt->bind_param("s", $formatted_queue_number);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+    }
+
     // Insert into queue table
-    $sql = "INSERT INTO queue (transaction_type, queue_number, status) 
-            VALUES ('$transaction_type', '$formatted_queue_number', 'waiting')";
-    mysqli_query($conn, $sql);
+    $stmt = $conn->prepare("INSERT INTO queue (queue_number, transaction_type, status) VALUES (?, ?, 'waiting')");
+    $stmt->bind_param("ss", $formatted_queue_number, $transaction_type);
+    $stmt->execute();
+    $stmt->close();
+
+    $_SESSION['queue_number'] = $formatted_queue_number;
 }
 
 // Get the latest queue number for display
@@ -34,6 +71,7 @@ $result = mysqli_query($conn, $sql);
 $user_queue = mysqli_fetch_assoc($result);
 
 mysqli_close($conn);
+
 
 ?>
 

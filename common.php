@@ -27,6 +27,8 @@ foreach ($transaction_types as $type) {
 }
 
 mysqli_close($conn);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -61,9 +63,6 @@ mysqli_close($conn);
             font-weight: bold;
             color: black;
         }
-        .serving { background-color; }
-        .next { background-color; }
-        .waiting { background-color; }
         .waiting-box {
             display: flex;
             flex-wrap: wrap;

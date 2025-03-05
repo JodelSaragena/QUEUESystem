@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 require 'db.php';
 
@@ -7,34 +7,60 @@ if (!isset($_SESSION['teller'])) {
     exit();
 }
 
+$teller_role = $_SESSION['teller']['role']; // Get the logged-in teller's role
+
+// Map teller roles to their respective transaction types
+$transaction_map = [
+    'tellerwithdraw' => 'withdrawal',
+    'tellerdeposit' => 'deposit',
+    'telleropenaccount' => 'open_account'
+];
+
+// Ensure the role exists in the mapping
+if (!isset($transaction_map[$teller_role])) {
+    die("Unauthorized access.");
+}
+
+$transaction_type = $transaction_map[$teller_role];
+
+// Fetch only transactions related to the logged-in teller's role
+$sql = "SELECT * FROM queue WHERE status IN ('waiting', 'serving') AND transaction_type = ? ORDER BY queue_number ASC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $transaction_type);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Handle 'Call Next' button
 if (isset($_POST['call_next'])) {
-    // Get the next user in line
-    $sql = "SELECT * FROM queue WHERE status='waiting' ORDER BY queue_number ASC LIMIT 1";
-    $result = mysqli_query($conn, $sql);
-    $next_user = mysqli_fetch_assoc($result);
+    $next_sql = "SELECT * FROM queue WHERE status='waiting' AND transaction_type = ? ORDER BY queue_number ASC LIMIT 1";
+    $stmt = $conn->prepare($next_sql);
+    $stmt->bind_param("s", $transaction_type);
+    $stmt->execute();
+    $next_user = $stmt->get_result()->fetch_assoc();
 
     if ($next_user) {
         $queue_id = $next_user['id'];
-        $update_sql = "UPDATE queue SET status='serving' WHERE id='$queue_id'";
-        mysqli_query($conn, $update_sql);
+        $update_sql = "UPDATE queue SET status='serving' WHERE id=?";
+        $stmt = $conn->prepare($update_sql);
+        $stmt->bind_param("i", $queue_id);
+        $stmt->execute();
         header("Location: tellerdashboard.php");
         exit();
     }
 }
 
+// Handle 'Mark Done' button
 if (isset($_POST['mark_done']) && isset($_POST['queue_id'])) {
     $queue_id = $_POST['queue_id'];
-    $update_sql = "UPDATE queue SET status='done' WHERE id='$queue_id'";
-    mysqli_query($conn, $update_sql);
+    $update_sql = "UPDATE queue SET status='done' WHERE id=?";
+    $stmt = $conn->prepare($update_sql);
+    $stmt->bind_param("i", $queue_id);
+    $stmt->execute();
     header("Location: tellerdashboard.php");
     exit();
 }
-
-$sql = "SELECT * FROM queue WHERE status IN ('waiting', 'serving') ORDER BY queue_number ASC";
-$result = mysqli_query($conn, $sql);
-
-mysqli_close($conn);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,12 +70,11 @@ mysqli_close($conn);
 </head>
 <body class="bg-light">
 <div class="container mt-4">
-    <h2 class="text-center">Welcome, <?php echo $_SESSION['teller']['username']; ?></h2>
+    <h2 class="text-center">Welcome, <?php echo $_SESSION['teller']['username']; ?> (<?php echo ucfirst(str_replace('teller', '', $teller_role)); ?>)</h2>
 
-   
     <div class="card shadow-lg mx-auto" style="max-width: 800px;">
         <div class="card-header" style="background-color: #433878; color: white; text-align: center; padding: 10px 20px; font-size: 1.2rem;">
-            <h5>Queue List</h5>
+            <h5>Your Assigned Transactions (<?php echo ucfirst(str_replace('_', ' ', $transaction_type)); ?>)</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive"> 
@@ -57,17 +82,14 @@ mysqli_close($conn);
                     <thead class="table-dark">
                         <tr>
                             <th style="width: 12%;">Queue Number</th>
-                            <th style="width: 25%;">Transaction Type</th>
                             <th style="width: 18%;">Status</th>
                             <th style="width: 30%;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                  
-                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><strong><?php echo $row['queue_number']; ?></strong></td>
-                                <td><?php echo ucfirst($row['transaction_type']); ?></td>
                                 <td>
                                     <span class="badge bg-<?php echo ($row['status'] == 'serving') ? 'success' : 'warning'; ?>">
                                         <?php echo ucfirst($row['status']); ?>
@@ -93,7 +115,6 @@ mysqli_close($conn);
         </div>
     </div>
 
-    <!-- Logout-->
     <div class="text-center mt-3">
         <a href="teller.php" class="btn btn-danger btn-sm">Logout</a>
     </div>

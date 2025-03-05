@@ -1,5 +1,4 @@
--- Drop the existing database and create a new one
-DROP DATABASE IF EXISTS queueing;
+
 CREATE DATABASE queueing;
 USE queueing;
 
@@ -8,46 +7,44 @@ CREATE TABLE tellers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,  -- Store hashed passwords
-    role ENUM('admin', 'teller') NOT NULL,
+    role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
-
+s
 -- 2. Create queue table (no user_id, use NULL for userless entries)
 CREATE TABLE queue (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    queue_number VARCHAR(10) NOT NULL UNIQUE,  -- Supports formatted numbers like D1, W1, A1
     transaction_type ENUM('deposit', 'withdrawal', 'open_account') NOT NULL,
-    queue_number INT NOT NULL,
     status ENUM('waiting', 'serving', 'done') DEFAULT 'waiting',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- 3. Create notifications table
-CREATE TABLE notifications (
+CREATE TABLE queue (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    queue_id INT,
-    message TEXT NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
+    queue_number VARCHAR(10) NOT NULL UNIQUE,  
+    transaction_type ENUM('deposit', 'withdrawal', 'open_account') NOT NULL,
+    status ENUM('waiting', 'serving', 'done') DEFAULT 'waiting',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (queue_id) REFERENCES queue(id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 
 
-
--- Insert the Admin account (with password 'admin')
 INSERT INTO tellers (username, password, role) 
 VALUES ('admin', PASSWORD('admin'), 'admin');
 
--- Insert the Teller account (with password 'teller')
-INSERT INTO tellers (username, password, role) 
-VALUES ('teller', PASSWORD('teller'), 'teller');
-
-
-
-
-
-ALTER TABLE queue ADD COLUMN transaction_type ENUM('deposit', 'withdraw', 'open_account') NOT NULL;
 
 
 ALTER TABLE queue AUTO_INCREMENT = 100;
+
+
+ALTER TABLE tellers 
+MODIFY role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
+
+INSERT INTO tellers (username, password, role) VALUES  
+('tellerwithdraw', 'password123', 'tellerwithdraw'), 
+('tellerdeposit', 'password123', 'tellerdeposit'), 
+('telleropenaccount', 'password123', 'telleropenaccount');
+

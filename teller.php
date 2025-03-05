@@ -6,26 +6,33 @@ if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // check for the user in db
-    $sql = "SELECT * FROM tellers WHERE username='$username' AND password='$password'";
-    $result = mysqli_query($conn, $sql);
+    // Use prepared statement to prevent SQL injection
+    $sql = "SELECT * FROM tellers WHERE username = ? AND password = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
+    // Fetch the user data
+    if ($row = $result->fetch_assoc()) {
+        $_SESSION['teller'] = $row;
 
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
-
-        
-        $_SESSION['teller'] = $user;  
-
-        header("Location: tellerdashboard.php");
+        // Redirect based on role
+        if ($row['role'] == 'admin') {
+            header("Location: admindashboard.php");
+        } else {
+            header("Location: tellerdashboard.php");
+        }
         exit();
     } else {
-        $error_msg = "Invalid login!"; 
+        $error_msg = "Invalid username or password!";
     }
 }
 
-mysqli_close($conn); 
+$conn->close();
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
