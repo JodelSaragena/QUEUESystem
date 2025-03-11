@@ -1,41 +1,58 @@
 <?php
-session_start();  
+session_start();
 require 'db.php';
 
-if (isset($_POST['login'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    // Use prepared statement to prevent SQL injection
-    $sql = "SELECT * FROM tellers WHERE username = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $password);
+    $stmt = $conn->prepare("SELECT * FROM tellers WHERE username = ?");
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
+    
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
+        if (password_verify($password, $user['password'])) {
+            session_regenerate_id(true); 
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
 
-    // Fetch the user data
-    if ($row = $result->fetch_assoc()) {
-        $_SESSION['teller'] = $row;
+            $redirects = [
+                'admin' => 'admindashboard.php',
+                'tellerwithdraw' => 'tellerwithdrawdashboard.php',
+                'tellerdeposit' => 'tellerdepositdashboard.php',
+                'telleropenaccount' => 'telleropenaccountdashboard.php',
+                'tellerdocumentation' => 'tellerdocumentationdashboard.php',
+                'tellercrewing' => 'tellercrewingdashboard.php',
+                'tellertechops' => 'tellertechopsdashboard.php',
+                'tellersourcing' => 'tellersourcingdashboard.php',
+                'tellertanker' => 'tellertankerdashboard.php',
+                'tellerwelfare' => 'tellerwelfaredashboard.php'
+            ];
 
-        // Redirect based on role
-        if ($row['role'] == 'admin') {
-            header("Location: admindashboard.php");
+            if (isset($redirects[$_SESSION['role']])) {
+                header("Location: " . $redirects[$_SESSION['role']]);
+                exit();
+            } else {
+                echo "<script>alert('Invalid role'); window.location.href='login.php';</script>";
+            }
+            
         } else {
-            header("Location: tellerdashboard.php");
+            echo "<script>alert('Incorrect password!'); window.location.href='login.php';</script>";
         }
-        exit();
     } else {
-        $error_msg = "Invalid username or password!";
+        echo "<script>alert('User not found!'); window.location.href='login.php';</script>";
     }
 }
-
-$conn->close();
-
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Teller Login </title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teller Login</title>
@@ -97,7 +114,7 @@ $conn->close();
                         <h4>Teller/ Admin Login</h4>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="teller.php">
+                        <form method="POST" action="login.php">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>

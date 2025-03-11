@@ -1,13 +1,13 @@
-<?php 
+<!-- <?php 
 session_start();
 require 'db.php';
 
 if (!isset($_SESSION['teller'])) {
-    header("Location: teller.php");
+    header("Location: login.php");
     exit();
 }
 
-$teller_role = $_SESSION['teller']['role']; // Get the logged-in teller's role
+$teller_role = $_SESSION['teller']['role']; // teller's role
 
 // Map teller roles to their respective transaction types
 $transaction_map = [
@@ -116,8 +116,9 @@ if (isset($_POST['mark_done']) && isset($_POST['queue_id'])) {
     </div>
 
     <div class="text-center mt-3">
-        <a href="teller.php" class="btn btn-danger btn-sm">Logout</a>
+        <a href="login.php" class="btn btn-danger btn-sm">Logout</a>
     </div>
 </div>
 </body>
 </html>
+ -->

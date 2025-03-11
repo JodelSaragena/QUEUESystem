@@ -40,3 +40,9 @@ INSERT INTO tellers (username, password, role) VALUES
 ('tellerdeposit', 'password123', 'tellerdeposit'), 
 ('telleropenaccount', 'password123', 'telleropenaccount');
 
+ALTER TABLE tellers MODIFY COLUMN role ENUM('tellerwithdraw', 'tellerdeposit', 'telleropenaccount', 
+                                            'tellerdocumentation', 'tellercrewing', 'tellertechOps', 
+                                            'tellersourcing', 'tellertanker', 'tellerwelfare') NOT NULL;
+
+INSERT INTO tellers (username, password, role) 
+VALUES ('admin', '$2y$10$QrJiysSHB9QVhK3fyyBYte2EAz34PDOrvV9sKU/l33Gsi6mgh7VlO', 'admin');

@@ -4,7 +4,7 @@ include("db.php");
 
 if (isset($_SESSION['teller'])) {
     session_destroy();
-    header("Location: teller.php"); 
+    header("Location: login.php"); 
     exit();
 }
 ?>

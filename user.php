@@ -19,8 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
-
-    // In. queue number
     $new_queue_number = 1;
 
     if ($row) {
@@ -31,10 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
         }
     }
 
-    // Format queue number (D1, W2, A3)
+    // Format 
     $formatted_queue_number = $prefix . $new_queue_number;
 
-    // Check if the generated queue number already exists (extra safety)
+    // Check if the generated queue number already exists
     $stmt = $conn->prepare("SELECT COUNT(*) FROM queue WHERE queue_number = ?");
     $stmt->bind_param("s", $formatted_queue_number);
     $stmt->execute();
@@ -55,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
         $stmt->close();
     }
 
-    // Insert into queue table
+    // Insert in table
     $stmt = $conn->prepare("INSERT INTO queue (queue_number, transaction_type, status) VALUES (?, ?, 'waiting')");
     $stmt->bind_param("ss", $formatted_queue_number, $transaction_type);
     $stmt->execute();
@@ -63,11 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
 
     $_SESSION['queue_number'] = $formatted_queue_number;
 }
-
-// Get the latest queue number for display
-$sql = "SELECT queue_number, status FROM queue WHERE status != 'done' ORDER BY created_at DESC LIMIT 1";
-$result = mysqli_query($conn, $sql);
-$user_queue = mysqli_fetch_assoc($result);
+// latest queue number
+$sql = "SELECT queue_number, status FROM queue WHERE queue_number = ? LIMIT 1";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $_SESSION['queue_number']);
+$stmt->execute();
+$result = $stmt->get_result();
+$user_queue = $result->fetch_assoc();
 
 mysqli_close($conn);
 
