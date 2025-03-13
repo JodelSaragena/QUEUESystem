@@ -26,7 +26,7 @@ $pdf->SetFont('dejavusans', '', 10);
 $pdf->AddPage();
 
 // Fetch transactions based on type
-$sql = "SELECT queue_number, transaction_type, status, created_at FROM queue WHERE transaction_type=? ORDER BY created_at DESC";
+$sql = "SELECT queue_number, transaction_type /*status*/, created_at FROM queue WHERE transaction_type=? ORDER BY created_at DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $type);
 $stmt->execute();
@@ -38,7 +38,6 @@ $html = '<h2>' . ucfirst(str_replace('_', ' ', $type)) . ' Transactions Report</
     <tr>
         <th><b>Queue No.</b></th>
         <th><b>Transaction Type</b></th>
-        <th><b>Status</b></th>
         <th><b>Date</b></th>
     </tr>';
 
@@ -46,7 +45,6 @@ while ($row = $result->fetch_assoc()) {
     $html .= '<tr>
         <td>' . $row['queue_number'] . '</td>
         <td>' . ucfirst(str_replace('_', ' ', $row['transaction_type'])) . '</td>
-        <td>' . ucfirst($row['status']) . '</td>
         <td>' . $row['created_at'] . '</td>
     </tr>';
 }

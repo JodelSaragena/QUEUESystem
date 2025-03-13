@@ -16,41 +16,45 @@ $transaction_types = ['withdrawal', 'deposit', 'open_account'];
 $stats = [];
 
 foreach ($transaction_types as $type) {
-    // Today
+    // Initialize array to prevent undefined keys
+    $stats[$type] = [
+        'today' => 0,
+        'month' => 0,
+        'year' => 0
+    ];
+
+    // Fetch transactions for today
     $sql_today = "SELECT COUNT(*) as count FROM queue WHERE transaction_type=? AND DATE(created_at) = CURDATE()";
     $stmt_today = $conn->prepare($sql_today);
     $stmt_today->bind_param("s", $type);
     $stmt_today->execute();
     $result_today = $stmt_today->get_result();
-    $row_today = $result_today->fetch_assoc();
-    $today_count = $row_today ? $row_today['count'] : 0;
+    if ($row_today = $result_today->fetch_assoc()) {
+        $stats[$type]['today'] = $row_today['count'];
+    }
 
-    // This Month
+    // Fetch transactions for this month
     $sql_month = "SELECT COUNT(*) as count FROM queue WHERE transaction_type=? AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())";
     $stmt_month = $conn->prepare($sql_month);
     $stmt_month->bind_param("s", $type);
     $stmt_month->execute();
     $result_month = $stmt_month->get_result();
-    $row_month = $result_month->fetch_assoc();
-    $month_count = $row_month ? $row_month['count'] : 0;
+    if ($row_month = $result_month->fetch_assoc()) {
+        $stats[$type]['month'] = $row_month['count'];
+    }
 
-    // Total
-    $sql_total = "SELECT COUNT(*) as count FROM queue WHERE transaction_type=?";
-    $stmt_total = $conn->prepare($sql_total);
-    $stmt_total->bind_param("s", $type);
-    $stmt_total->execute();
-    $result_total = $stmt_total->get_result();
-    $row_total = $result_total->fetch_assoc();
-    $total_count = $row_total ? $row_total['count'] : 0;
-
-    // Store results
-    $stats[$type] = [
-        'today' => $today_count,
-        'month' => $month_count,
-        'total' => $total_count
-    ];
+    // Fetch transactions for this year
+    $sql_year = "SELECT COUNT(*) as count FROM queue WHERE transaction_type=? AND YEAR(created_at) = YEAR(CURDATE())";
+    $stmt_year = $conn->prepare($sql_year);
+    $stmt_year->bind_param("s", $type);
+    $stmt_year->execute();
+    $result_year = $stmt_year->get_result();
+    if ($row_year = $result_year->fetch_assoc()) {
+        $stats[$type]['year'] = $row_year['count'];
+    }
 }
 
+   
 // Update queue status - Mark as Done
 if (isset($_POST['mark_done']) && isset($_POST['queue_id'])) {
     $queue_id = $_POST['queue_id'];
@@ -84,47 +88,56 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .stats-container {
+            flex: 1;
+            max-width: 40%;
+        }
+        .table-container {
+            flex: 2;
+            max-width: 60%;
+        }
         .table th, .table td {
-            text-align: center;
+            max-width: 120px;
             white-space: nowrap;
-            font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: center;
             padding: 8px;
+            font-size: 1rem;
+        }
+        .table-responsive {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .card-header {
+            background-color: #433878;
+            color: white;
+            text-align: center;
         }
         .btn-sm {
             padding: 5px 10px;
             font-size: 0.9rem;
         }
-        .card-header {
-            background-color: #433878;
-            color: white;
-        }
-        .dashboard-container {
-            display: flex;
-            gap: 20px;
-        }
-        .stats-container {
-            flex: 1;
-        }
-        .stats-container .card {
-          width: 45%;
-        }
-        .table-container {
-            flex: 1;
-        }
         @media (max-width: 768px) {
             .dashboard-container {
                 flex-direction: column;
+            }
+            .stats-container, .table-container {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body class="bg-light">
 <div class="container mt-3">
-    <!-- Top Section: Buttons on the Right & Title at the Center -->
+    
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <div></div> <!-- Empty div to balance alignment -->
         <h2 class="text-center flex-grow-1">Welcome! Admin Dashboard</h2>
-        <br><br><br>
         <div class="d-flex">
             <a href="createaccount.php" class="btn btn-primary me-2">Create Account</a>
             <a href="login.php" class="btn btn-danger">Logout</a>
@@ -132,25 +145,45 @@ $conn->close();
     </div>
 
     <div class="dashboard-container">
+        <!-- Transaction Summary (Left Side) -->
         <div class="stats-container">
-            <?php foreach ($transaction_types as $type): ?>
-                <div class="card shadow-lg mb-3">
-                    <div class="card-header">Total <?php echo ucfirst(str_replace('_', ' ', $type)); ?> Transactions</div>
-                    <div class="card-body text-center">
-                        <p>Today: <strong><?php echo $stats[$type]['today']; ?></strong></p>
-                        <p>This Month: <strong><?php echo $stats[$type]['month']; ?></strong></p>
-                        <p>Overall: <strong><?php echo $stats[$type]['total']; ?></strong></p>
-                        <a href="export_pdf.php?type=<?php echo $type; ?>" class="btn btn-success mb-3">
-                            Export <?php echo ucfirst(str_replace('_', ' ', $type)); ?> Transactions
-                        </a>
-
+            <div class="card shadow-lg mb-3">
+                <div class="card-header">Transaction Summary</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Today</th>
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                    <th>Export</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($transaction_types as $type): ?>
+                                    <tr>
+                                        <td><?php echo ucfirst(str_replace('_', ' ', $type)); ?></td>
+                                        <td><?php echo $stats[$type]['today']; ?></td>
+                                        <td><?php echo $stats[$type]['month']; ?></td>
+                                        <td><?php echo $stats[$type]['year']; ?></td>
+                                        <td>
+                                            <a href="export_pdf.php?type=<?php echo $type; ?>" class="btn btn-success btn-sm">Export pdf</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            </div>
         </div>
+
+        <!-- All Transactions (Right Side) -->
         <div class="table-container">
             <div class="card shadow-lg">
-                <div class="card-header text-center">All Transactions</div>
+                <div class="card-header">All Transactions</div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
@@ -195,6 +228,7 @@ $conn->close();
             </div>
         </div>
     </div>
+
 </div>
 </body>
 </html>

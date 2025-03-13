@@ -46,3 +46,29 @@ ALTER TABLE tellers MODIFY COLUMN role ENUM('tellerwithdraw', 'tellerdeposit', '
 
 INSERT INTO tellers (username, password, role) 
 VALUES ('admin', '$2y$10$QrJiysSHB9QVhK3fyyBYte2EAz34PDOrvV9sKU/l33Gsi6mgh7VlO', 'admin');
+
+--new table for queueing 
+CREATE TABLE documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    file_path VARCHAR(255),
+    created_by VARCHAR(255) NOT NULL,  -- Stores the username of the uploader
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+--new table for queueing 
+CREATE TABLE employees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    gender ENUM('Male', 'Female', 'Other') NOT NULL,
+    age INT NOT NULL,
+    birthday DATE NOT NULL,
+    address TEXT NOT NULL,
+    contact VARCHAR(50) NOT NULL,
+    role ENUM('tellerDocumentation', 'tellerCrewing', 'tellerTechOps', 'tellerSourcing', 'tellerTanker', 'tellerWelfare') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE employees AUTO_INCREMENT = 1;

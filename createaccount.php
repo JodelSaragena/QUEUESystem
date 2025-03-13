@@ -7,13 +7,16 @@ $count_query = $conn->query("SELECT COUNT(*) as total FROM tellers");
 $count_result = $count_query->fetch_assoc();
 $total_accounts = $count_result['total'];
 
+// Fetch all teller accounts
+$accounts_query = $conn->query("SELECT id, username, role FROM tellers");
+$accounts = $accounts_query->fetch_all(MYSQLI_ASSOC);
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash password
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
 
-    // Check if username already exists
     $check_query = $conn->prepare("SELECT id FROM tellers WHERE username = ?");
     $check_query->bind_param("s", $username);
     $check_query->execute();
@@ -22,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($check_result->num_rows > 0) {
         echo "<script>alert('Username already exists!'); window.location.href='createaccount.php';</script>";
     } else {
-        // Insert new teller
         $stmt = $conn->prepare("INSERT INTO tellers (username, password, role) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $username, $password, $role);
 
@@ -34,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,184 +44,131 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Account</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body {
-            background-color: #f8f9fa; /* Light gray background */
-        }
-        .form-card, .stats-card {
-            width: 100%;
-            max-width: 450px; /* Keeps cards from being too wide */
-            margin: auto;
-        }
-        .dashboard-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .card-header {
-            background-color: #433878; /* Matches admin dashboard */
-            color: white;
-            font-weight: bold;
-        }
-        .btn-primary {
-            background-color: #433878; /* Dark purple */
-            border-color: #433878;
-        }
-    
-        .btn-dashboard {
-            background-color: #433878; 
-            color: white;
-        }
-        .btn-dashboard:hover {
-            background-color: #362c66;
-        }
-        .display-4 {
-            color: #433878; /* Matches the header color */
-            font-weight: bold;
-        }
+        body { background-color: #f8f9fa; }
+        .card-header { background-color: #433878; color: white; font-weight: bold; }
+        .btn-primary { background-color: #433878; border-color: #433878; }
+        .btn-dashboard { background-color: #433878; border-color: #433878;color: white; }
+        .display-4 { color: #433878; font-weight: bold; }
     </style>
 </head>
-<title>Create Account Dashboard</title>
 <body>
     <div class="container mt-3">
-        <!-- Back to Dashboard Button -->
-        <div class="d-flex justify-content-start">
+        <div class="d-flex justify-content-start mb-3">
             <a href="admindashboard.php" class="btn btn-dashboard">Back to Dashboard</a>
         </div>
 
-        <!-- Dashboard Layout -->
-        <div class="dashboard-container">
-            <!-- Create Account Form (Left) -->
-            <div class="card form-card shadow">
-                <div class="card-header text-center">Create New Teller Account</div>
-                <div class="card-body">
-                    <form method="POST" action="createaccount.php">
-                        <div class="mb-3">
-                            <label class="form-label">Username:</label>
-                            <input type="text" name="username" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Password:</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-header text-center">Create New Teller Account</div>
+                    <div class="card-body">
+                        <form method="POST" action="createaccount.php">
+                            <div class="mb-3">
+                                <label class="form-label">Username:</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password:</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
                             <label class="form-label">Role:</label>
-                            <select name="role" class="form-select" required>
-                                <option value="admin">Admin</option>
-                                <option value="tellerWithdraw">Teller Withdraw</option>
-                                <option value="tellerDeposit">Teller Deposit</option>
-                                <option value="tellerOpenAccount">Teller Open Account</option>
-                                <option value="tellerDocumentation">Teller Documentation</option>
-                                <option value="tellerCrewing">Teller Crewing</option>
-                                <option value="tellerTechOps">Teller Tech Ops</option>
-                                <option value="tellerSourcing">Teller Sourcing</option>
-                                <option value="tellerTanker">Teller Tanker</option>
-                                <option value="tellerWelfare">Teller Welfare</option>
-                            </select>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Create Account</button>
-                        </div>
-                    </form>
+                                <select name="role" class="form-select" required>
+                                    <option value="admin">Admin</option>
+                                    <option value="tellerWithdraw">Teller Withdraw</option>
+                                    <option value="tellerDeposit">Teller Deposit</option>
+                                    <option value="tellerOpenAccount">Teller Open Account</option>
+                                    <option value="tellerDocumentation">Teller Documentation</option>
+                                    <option value="tellerCrewing">Teller Crewing</option>
+                                    <option value="tellerTechOps">Teller Tech Ops</option>
+                                    <option value="tellerSourcing">Teller Sourcing</option>
+                                    <option value="tellerTanker">Teller Tanker</option>
+                                    <option value="tellerWelfare">Teller Welfare</option>
+                                </select>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Create Account</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
-
-          <!-- Total Accounts Created (Right) -->
-<div class="card stats-card shadow">
-    <div class="card-header text-center">Total Accounts Created</div>
-    <div class="card-body text-center">
-        <p class="display-4" id="totalAccounts">
-            <?php
-            require 'db.php';
-            $result = $conn->query("SELECT COUNT(*) AS total FROM tellers");
-            $row = $result->fetch_assoc();
-            echo $row['total'];
-            ?>
-        </p>
-        <!-- Button to trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#accountsModal">
-            Accounts Created
-        </button>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="accountsModal" tabindex="-1" aria-labelledby="accountsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="accountsModalLabel">List of Created Accounts</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <ul class="list-group" id="userList">
-                    <?php
-                    $users_query = $conn->query("SELECT id, username FROM tellers");
-                    while ($user = $users_query->fetch_assoc()) {
-                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">' .
-                            $user['username'] .
-                            ' <button class="btn btn-danger btn-sm delete-btn" data-id="' . $user['id'] . '">Delete</button>
-                        </li>';
-                    }
-                    ?>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Done</button>
+            <!-- Right Column -->
+            <div class="col-md-3">
+                <div class="card shadow text-center">
+                    <div class="card-header">Total Accounts Created</div>
+                    <div class="card-body">
+                        <p class="display-4" id="totalAccounts"><?php echo $total_accounts; ?></p>
+                        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#accountsModal">Accounts</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JavaScript (Ensure Bootstrap is included) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Accounts Modal -->
+    <div class="modal fade" id="accountsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">List of Accounts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accountsTable">
+                            <?php foreach ($accounts as $account) : ?>
+                                <tr id="row-<?php echo $account['id']; ?>">
+                                    <td><?php echo htmlspecialchars($account['username']); ?></td>
+                                    <td><?php echo htmlspecialchars($account['role']); ?></td>
+                                    <td>
+                                        <?php if ($account['role'] !== 'admin') : ?>
+                                            <button class="btn btn-danger btn-sm" onclick="deleteAccount(<?php echo $account['id']; ?>)">Delete</button>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
 
-<!-- AJAX Script -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function() {
-            let userId = this.getAttribute("data-id");
-            let listItem = this.closest("li");
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        function deleteAccount(accountId) {
             if (confirm("Are you sure you want to delete this account?")) {
-                fetch("delete_account.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: "id=" + userId
-                })
-                .then(response => response.text())
-                .then(data => {
-                    if (data === "success") {
-                        listItem.remove();
-                        updateTotalAccounts();
-                    } else {
-                        alert("Error deleting account.");
+                $.ajax({
+                    url: 'delete_account.php',
+                    type: 'POST',
+                    data: { id: accountId },
+                    success: function(response) {
+                        if (response === "success") {
+                            document.getElementById("row-" + accountId).remove();
+                            let total = parseInt(document.getElementById("totalAccounts").innerText);
+                            document.getElementById("totalAccounts").innerText = total - 1;
+                        } else {
+                            alert("Error deleting account.");
+                        }
                     }
                 });
             }
-        });
-    });
-
-    function updateTotalAccounts() {
-        fetch("count_accounts.php")
-        .then(response => response.text())
-        .then(count => {
-            document.getElementById("totalAccounts").innerText = count;
-        });
-    }
-});
-</script>
-
-        </div>
-    </div>
+        }
+    </script>
 </body>
 </html>
-
