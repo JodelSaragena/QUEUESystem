@@ -12,7 +12,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'tellercrewing') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teller Crewing Dashboard</title>
+    <title>Crewing Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -46,7 +46,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'tellercrewing') {
                 <div class="card mt-1 shadow">
                     <div class="card-header">📌 Teller Crewing Officer</div>
                     <div class="card-body">
-                        <p>✅ Responsible for managing employees in teller operations.</p>
+                        <p>✅ Responsible for managing employees.</p>
                     </div>
                 </div>
             </div>

@@ -70,7 +70,6 @@ if (isset($_GET['delete'])) {
 <div class="container mt-3 d-flex justify-content-between align-items-center">
     <a href="tellercrewingdashboard.php" class="btn btn-secondary">Back to Dashboard</a>
     <h2 class="text-center flex-grow-1">Employee Information Management</h2>
-    <a href="logout.php" class="btn btn-danger">Logout</a>
 </div>
 
 <div class="container mt-4">
@@ -112,6 +111,9 @@ if (isset($_GET['delete'])) {
                             <label class="form-label">Role:</label>
                             <select name="role" class="form-control" required>
                                 <option value="Admin">Admin</option>
+                                <option value="tellerwithdraw">Teller Withdraw</option>
+                                <option value="tellerdeposit">Teller Deposit</option>
+                                <option value="telleropenaccount">Teller Open Account</option>
                                 <option value="tellerDocumentation">Teller Documentation</option>
                                 <option value="tellerCrewing">Teller Crewing</option>
                                 <option value="tellerTechOps">Teller TechOps</option>
@@ -126,7 +128,7 @@ if (isset($_GET['delete'])) {
             </div>
         </div>
 
-        <div class="col-md-8 card-spacing">
+        <div class="col-md-9 card-spacing">
             <div class="card shadow">
                 <div class="card-header text-white" style="background-color: #433878;">📋 Employee List</div>
                 <div class="card-body">
@@ -146,7 +148,8 @@ if (isset($_GET['delete'])) {
                         </thead>
                         <tbody>
                             <?php
-                            $query = $conn->query("SELECT * FROM employees ORDER BY id DESC");
+                            $query = $conn->query("SELECT * FROM employees ORDER BY id ASC");
+                        
                             while ($row = $query->fetch_assoc()) {
                                 echo "<tr>";
                                 echo "<td>" . $row['id'] . "</td>";

@@ -168,7 +168,7 @@ $conn->close();
                                         <td><?php echo $stats[$type]['today']; ?></td>
                                         <td><?php echo $stats[$type]['month']; ?></td>
                                         <td><?php echo $stats[$type]['year']; ?></td>
-                                        <td>
+                                <td>
                                             <a href="export_pdf.php?type=<?php echo $type; ?>" class="btn btn-success btn-sm">Export pdf</a>
                                         </td>
                                     </tr>
@@ -179,6 +179,11 @@ $conn->close();
                 </div>
             </div>
         </div>
+        <script>
+                setInterval(() => {
+                    location.reload();
+                }, 10000); // Refresh every 60 seconds
+        </script>
 
         <!-- All Transactions (Right Side) -->
         <div class="table-container">

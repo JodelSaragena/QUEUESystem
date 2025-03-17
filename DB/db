@@ -72,3 +72,6 @@ CREATE TABLE employees (
 
 
 ALTER TABLE employees AUTO_INCREMENT = 1;
+
+ALTER TABLE employees
+MODIFY COLUMN role ENUM('admin','tellerwithdraw', 'tellerdeposit', 'telleropenaccount','tellerDocumentation', 'tellerCrewing', 'tellerTechOps', 'tellerSourcing', 'tellerTanker', 'tellerWelfare') NOT NULL;
