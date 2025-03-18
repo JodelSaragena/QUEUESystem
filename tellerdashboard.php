@@ -9,7 +9,7 @@ if (!isset($_SESSION['teller'])) {
 
 $teller_role = $_SESSION['teller']['role']; // teller's role
 
-// Map teller roles to their respective transaction types
+//teller roles 
 $transaction_map = [
     'tellerwithdraw' => 'withdrawal',
     'tellerdeposit' => 'deposit',

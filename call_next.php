@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
     $stmt->bind_param("i", $id);
 
     if ($stmt->execute()) {
-        header("Location: " . $_SERVER['HTTP_REFERER']); // Redirect back to the dashboard
+        header("Location: " . $_SERVER['HTTP_REFERER']); //  back to the dashboard
         exit();
     }
 }

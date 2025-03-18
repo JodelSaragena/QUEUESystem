@@ -27,22 +27,22 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'tellerwelfare') {
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-6 offset-md-3">
+<div class="container mt-4">
+<h2 class="text-center">Welcome, <?php echo $_SESSION['username']; ?>!</h2> 
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
                 <div class="card shadow-lg">
-                    <div class="card-header">🎉 Welfare Dashboard</div>
+                    <div class="card-header">🎉 Welfare Dashreboard</div>
                     <div class="card-body text-center">
                         <p>Welcome to the Welfare Dashboard!</p>
                     </div>
                 </div>
             </div>
         </div>
-        <a href="login.php" class="btn btn-danger">Logout</a>
+
+        <div class="text-center mt-4">
+            <a href="login.php" class="btn btn-danger">Logout</a>
+        </div>
     </div>
 </body>
 </html>

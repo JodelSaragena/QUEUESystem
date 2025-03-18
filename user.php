@@ -1,76 +1,60 @@
 <?php
 require 'db.php';
+require 'db.php';
+date_default_timezone_set('Asia/Manila'); // Ensure correct timezone
+
+$today = date('Y-m-d');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['transaction_type'])) {
     $transaction_type = $_POST['transaction_type'];
-
 
     if ($transaction_type == "account opening") {
         $transaction_type = "open_account"; 
     }
 
-    // prefix 
+    // Prefix based on transaction type
     $prefix = ($transaction_type == "deposit") ? "D-" :
               (($transaction_type == "withdrawal") ? "W-" : "A-");
 
-    // Get the last queue number /specific transaction type
-    $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE transaction_type = ? ORDER BY id DESC LIMIT 1");
-    $stmt->bind_param("s", $transaction_type);
+    // Check the last queue number for today
+    $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE transaction_type = ? AND date_generated = ? ORDER BY id DESC LIMIT 1");
+    $stmt->bind_param("ss", $transaction_type, $today);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
-    $new_queue_number = 1;
+    $stmt->close();
 
+    // Start from 1 if no queue exists today
+    $new_queue_number = 1;
     if ($row) {
-        // Extract the numeric part of the last queue number ( A5 → 5)
         preg_match('/(\d+)$/', $row['queue_number'], $matches);
         if (isset($matches[1])) {
             $new_queue_number = (int)$matches[1] + 1;
         }
     }
 
-    // Format 
+    // Format the queue number with prefix
     $formatted_queue_number = $prefix . $new_queue_number;
 
-    // Check if the generated queue number already exists
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM queue WHERE queue_number = ?");
-    $stmt->bind_param("s", $formatted_queue_number);
-    $stmt->execute();
-    $stmt->bind_result($count);
-    $stmt->fetch();
-    $stmt->close();
-
-    // If duplicate check again
-    while ($count > 0) {
-        $new_queue_number++;
-        $formatted_queue_number = $prefix . $new_queue_number;
-
-        $stmt = $conn->prepare("SELECT COUNT(*) FROM queue WHERE queue_number = ?");
-        $stmt->bind_param("s", $formatted_queue_number);
-        $stmt->execute();
-        $stmt->bind_result($count);
-        $stmt->fetch();
-        $stmt->close();
-    }
-
-    // Insert in table
-    $stmt = $conn->prepare("INSERT INTO queue (queue_number, transaction_type, status) VALUES (?, ?, 'waiting')");
-    $stmt->bind_param("ss", $formatted_queue_number, $transaction_type);
+    // Insert the new queue number with today's date
+    $stmt = $conn->prepare("INSERT INTO queue (queue_number, transaction_type, status, date_generated) VALUES (?, ?, 'waiting', ?)");
+    $stmt->bind_param("sss", $formatted_queue_number, $transaction_type, $today);
     $stmt->execute();
     $stmt->close();
 
     $_SESSION['queue_number'] = $formatted_queue_number;
 }
-// latest queue number
+
+// Retrieve latest queue number for the user
 $sql = "SELECT queue_number, status FROM queue WHERE queue_number = ? LIMIT 1";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $_SESSION['queue_number']);
 $stmt->execute();
 $result = $stmt->get_result();
 $user_queue = $result->fetch_assoc();
+$stmt->close();
 
-mysqli_close($conn);
-
+$conn->close();
 
 ?>
 

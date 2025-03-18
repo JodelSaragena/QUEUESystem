@@ -182,7 +182,7 @@ $conn->close();
         <script>
                 setInterval(() => {
                     location.reload();
-                }, 10000); // Refresh every 60 seconds
+                }, 10000); // Refresh every 10 seconds
         </script>
 
         <!-- All Transactions (Right Side) -->

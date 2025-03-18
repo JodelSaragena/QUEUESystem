@@ -27,6 +27,9 @@ CREATE TABLE queue (
 ALTER TABLE queue AUTO_INCREMENT = 100;
 INSERT INTO tellers (username, password, role) 
 VALUES ('admin', '$2y$10$QrJiysSHB9QVhK3fyyBYte2EAz34PDOrvV9sKU/l33Gsi6mgh7VlO', 'admin');
+
+ALTER TABLE queue ADD COLUMN date_generated DATE NOT NULL DEFAULT (CURRENT_DATE);
+
 --==================================================================================================================
 
 --table for documents 
