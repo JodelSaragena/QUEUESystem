@@ -2,23 +2,19 @@
 CREATE DATABASE queueing;
 USE queueing;
 
+--table for tellers
 CREATE TABLE tellers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL, 
-    role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount') NOT NULL;
+    role ENUM('admin', 'tellerwithdraw', 'tellerdeposit', 'telleropenaccount','telleropenaccount', 
+                                            'tellerdocumentation', 'tellercrewing', 'tellertechOps', 
+                                            'tellersourcing', 'tellertanker', 'tellerwelfare') NOT NULL;
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-CREATE TABLE queue (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    queue_number VARCHAR(10) NOT NULL UNIQUE,  -- Supports formatted numbers like D1, W1, A1
-    transaction_type ENUM('deposit', 'withdrawal', 'open_account') NOT NULL,
-    status ENUM('waiting', 'serving', 'done') DEFAULT 'waiting',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
-
+--==================================================================================================================
+--table for queue
 CREATE TABLE queue (
     id INT AUTO_INCREMENT PRIMARY KEY,
     queue_number VARCHAR(10) NOT NULL UNIQUE,  
@@ -28,36 +24,23 @@ CREATE TABLE queue (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
 ) ENGINE=InnoDB;
 
-
-
-INSERT INTO tellers (username, password, role) 
-VALUES ('admin', PASSWORD('admin'), 'admin');
-
 ALTER TABLE queue AUTO_INCREMENT = 100;
- 
-INSERT INTO tellers (username, password, role) VALUES  
-('tellerwithdraw', 'password123', 'tellerwithdraw'), 
-('tellerdeposit', 'password123', 'tellerdeposit'), 
-('telleropenaccount', 'password123', 'telleropenaccount');
-
-ALTER TABLE tellers MODIFY COLUMN role ENUM('tellerwithdraw', 'tellerdeposit', 'telleropenaccount', 
-                                            'tellerdocumentation', 'tellercrewing', 'tellertechOps', 
-                                            'tellersourcing', 'tellertanker', 'tellerwelfare') NOT NULL;
-
 INSERT INTO tellers (username, password, role) 
 VALUES ('admin', '$2y$10$QrJiysSHB9QVhK3fyyBYte2EAz34PDOrvV9sKU/l33Gsi6mgh7VlO', 'admin');
+--==================================================================================================================
 
---new table for queueing 
+--table for documents 
 CREATE TABLE documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     file_path VARCHAR(255),
-    created_by VARCHAR(255) NOT NULL,  -- Stores the username of the uploader
+    created_by VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+--==================================================================================================================
 
---new table for queueing 
+--table for employees 
 CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -66,12 +49,12 @@ CREATE TABLE employees (
     birthday DATE NOT NULL,
     address TEXT NOT NULL,
     contact VARCHAR(50) NOT NULL,
-    role ENUM('tellerDocumentation', 'tellerCrewing', 'tellerTechOps', 'tellerSourcing', 'tellerTanker', 'tellerWelfare') NOT NULL,
+    role ENUM('admin','tellerwithdraw', 'tellerdeposit', 'telleropenaccount',
+                'tellerDocumentation', 'tellerCrewing', 'tellerTechOps', 'tellerSourcing', 
+                'tellerTanker', 'tellerWelfare') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
 ALTER TABLE employees AUTO_INCREMENT = 1;
 
-ALTER TABLE employees
-MODIFY COLUMN role ENUM('admin','tellerwithdraw', 'tellerdeposit', 'telleropenaccount','tellerDocumentation', 'tellerCrewing', 'tellerTechOps', 'tellerSourcing', 'tellerTanker', 'tellerWelfare') NOT NULL;
