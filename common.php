@@ -8,17 +8,20 @@ $next_numbers = [];
 $waiting_numbers = [];
 
 foreach ($transaction_types as $type) {
+    // Get the currently serving number
     $sql = "SELECT queue_number FROM queue WHERE status='serving' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 1";
     $result = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($result);
     $serving_numbers[$type] = $row ? $row['queue_number'] : 'None';
 
+    // Get the next number in line
     $sql = "SELECT queue_number FROM queue WHERE status='waiting' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 1";
     $result = mysqli_query($conn, $sql);
     $row = mysqli_fetch_assoc($result);
     $next_numbers[$type] = $row ? $row['queue_number'] : 'None';
 
-    $sql = "SELECT queue_number FROM queue WHERE status='waiting' AND transaction_type='$type' ORDER BY queue_number ASC";
+    // Get the first four waiting numbers
+    $sql = "SELECT queue_number FROM queue WHERE status='waiting' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 3";
     $result = mysqli_query($conn, $sql);
     $waiting_numbers[$type] = [];
     while ($row = mysqli_fetch_assoc($result)) {
@@ -27,8 +30,6 @@ foreach ($transaction_types as $type) {
 }
 
 mysqli_close($conn);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -40,10 +41,16 @@ mysqli_close($conn);
     <title>Queue Display</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background: #f8f9fa;
+       /* body {
+            background: linear-gradient(to bottom, #E3A5C7, #694F8E);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            color: white;
             text-align: center;
-        }
+        }*/
         .card {
             width: 230px;
             height: 180px;
@@ -66,7 +73,6 @@ mysqli_close($conn);
         }
         .waiting-box {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             gap: 5px;
         }
@@ -143,6 +149,9 @@ mysqli_close($conn);
                                     <?php foreach ($waiting_numbers[$type] as $num): ?>
                                         <div class="waiting-number"> <?php echo $num; ?> </div>
                                     <?php endforeach; ?>
+                                    <?php if (empty($waiting_numbers[$type])): ?>
+                                        <div class="waiting-number">None</div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>

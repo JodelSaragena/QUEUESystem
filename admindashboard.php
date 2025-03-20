@@ -88,6 +88,16 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
+       /* body {
+            background: linear-gradient(to bottom, #E3A5C7, #694F8E);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            text-align: center;
+        }*/
         .dashboard-container {
             display: flex;
             gap: 20px;
@@ -115,8 +125,8 @@ $conn->close();
             overflow-y: auto;
         }
         .card-header {
-            background-color: #433878;
-            color: white;
+            background-color: white /* #433878*/;
+            color: black;
             text-align: center;
         }
         .btn-sm {
@@ -135,7 +145,6 @@ $conn->close();
 </head>
 <body class="bg-light">
 <div class="container mt-3">
-    
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="text-center flex-grow-1">Welcome! Admin Dashboard</h2>
         <div class="d-flex">

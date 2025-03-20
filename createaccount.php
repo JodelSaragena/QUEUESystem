@@ -47,11 +47,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body { background-color: #f8f9fa; }
-        .card-header { background-color: #433878; color: white; font-weight: bold; }
-        .btn-primary { background-color: #433878; border-color: #433878; }
-        .btn-dashboard { background-color: #433878; border-color: #433878;color: white; }
-        .display-4 { color: #433878; font-weight: bold; }
+      /* body {
+            background: linear-gradient(to bottom, #FFDFD6, #E3A5C7, #B692C2, #694F8E);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }*/
     </style>
 </head>
 <body>
