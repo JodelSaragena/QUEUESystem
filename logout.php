@@ -1,10 +1,6 @@
 <?php
 session_start();
-include("db.php");
-
-if (isset($_SESSION['teller'])) {
-    session_destroy();
-    header("Location: login.php"); 
-    exit();
-}
+session_destroy(); // Destroy all session data
+header("Location: login.php");
+exit();
 ?>

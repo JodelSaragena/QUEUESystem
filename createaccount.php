@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 require 'db.php'; // Ensure this connects to your database
 
@@ -8,15 +8,23 @@ $count_result = $count_query->fetch_assoc();
 $total_accounts = $count_result['total'];
 
 // Fetch all teller accounts
-$accounts_query = $conn->query("SELECT id, username, role FROM tellers");
+$accounts_query = $conn->query("SELECT id, username, role, department FROM tellers");
 $accounts = $accounts_query->fetch_all(MYSQLI_ASSOC);
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
+    $department = $_POST['department'];
 
+    // Validate inputs
+    if (empty($username) || empty($_POST['password']) || empty($role) || empty($department)) {
+        echo "<script>alert('All fields are required!'); window.location.href='createaccount.php';</script>";
+        exit();
+    }
+
+    // Prevent duplicate usernames
     $check_query = $conn->prepare("SELECT id FROM tellers WHERE username = ?");
     $check_query->bind_param("s", $username);
     $check_query->execute();
@@ -24,15 +32,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($check_result->num_rows > 0) {
         echo "<script>alert('Username already exists!'); window.location.href='createaccount.php';</script>";
-    } else {
-        $stmt = $conn->prepare("INSERT INTO tellers (username, password, role) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $password, $role);
+        exit();
+    }
 
-        if ($stmt->execute()) {
-            echo "<script>alert('Account created successfully!'); window.location.href='createaccount.php';</script>";
-        } else {
-            echo "<script>alert('Error creating account.');</script>";
-        }
+    // Insert new teller account
+    $stmt = $conn->prepare("INSERT INTO tellers (username, password, role, department) VALUES (?, ?, ?, ?)");
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
+
+    $stmt->bind_param("ssss", $username, $password, $role, $department);
+    if ($stmt->execute()) {
+        echo "<script>alert('Teller account created successfully!'); window.location.href='createaccount.php';</script>";
+    } else {
+        die("Execute failed: " . $stmt->error);
     }
 }
 ?>
@@ -45,23 +58,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Create Account</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-      /* body {
-            background: linear-gradient(to bottom, #FFDFD6, #E3A5C7, #B692C2, #694F8E);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
-        }*/
-    </style>
 </head>
 <body>
     <div class="container mt-3">
         <div class="d-flex justify-content-start mb-3">
-            <a href="admindashboard.php" class="btn btn-dashboard">Back to Dashboard</a>
+            <a href="admindashboard.php" class="btn btn-primary">Back to Dashboard</a>
         </div>
 
         <div class="row">
@@ -79,18 +80,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="password" name="password" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                            <label class="form-label">Role:</label>
+                                <label class="form-label">Role:</label>
                                 <select name="role" class="form-select" required>
-                                    <option value="admin">Admin</option>
-                                    <option value="tellerWithdraw">Teller Withdraw</option>
-                                    <option value="tellerDeposit">Teller Deposit</option>
-                                    <option value="tellerOpenAccount">Teller Open Account</option>
-                                    <option value="tellerDocumentation">Teller Documentation</option>
-                                    <option value="tellerCrewing">Teller Crewing</option>
-                                    <option value="tellerTechOps">Teller Tech Ops</option>
-                                    <option value="tellerSourcing">Teller Sourcing</option>
-                                    <option value="tellerTanker">Teller Tanker</option>
-                                    <option value="tellerWelfare">Teller Welfare</option>
+                                    <option value="admin">Admin</option>    
+                                    <option value="teller1">Teller 1</option>
+                                    <option value="teller2">Teller 2</option>
+                                    <option value="teller3">Teller 3</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Department:</label>
+                                <select name="department" class="form-select" required>
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="ACCOUNTS">Accounts</option>
+                                    <option value="DOCUMENTATION">Documentation</option>
+                                    <option value="CREWING">Crewing</option>
+                                    <option value="TECHOPS">Tech Ops</option>
+                                    <option value="SOURCING">Sourcing</option>
+                                    <option value="TANKER">Tanker</option>
+                                    <option value="WELFARE">Welfare</option>
                                 </select>
                             </div>
                             <div class="text-center">
@@ -107,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="card-header">Total Accounts Created</div>
                     <div class="card-body">
                         <p class="display-4" id="totalAccounts"><?php echo $total_accounts; ?></p>
-                        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#accountsModal">Accounts</button>
+                        <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#accountsModal">View Accounts</button>
                     </div>
                 </div>
             </div>
@@ -128,6 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <tr>
                                 <th>Username</th>
                                 <th>Role</th>
+                                <th>Department</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -136,6 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <tr id="row-<?php echo $account['id']; ?>">
                                     <td><?php echo htmlspecialchars($account['username']); ?></td>
                                     <td><?php echo htmlspecialchars($account['role']); ?></td>
+                                    <td><?php echo htmlspecialchars($account['department']); ?></td>
                                     <td>
                                         <?php if ($account['role'] !== 'admin') : ?>
                                             <button class="btn btn-danger btn-sm" onclick="deleteAccount(<?php echo $account['id']; ?>)">Delete</button>
@@ -144,11 +154,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -157,20 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script>
         function deleteAccount(accountId) {
             if (confirm("Are you sure you want to delete this account?")) {
-                $.ajax({
-                    url: 'delete_account.php',
-                    type: 'POST',
-                    data: { id: accountId },
-                    success: function(response) {
-                        if (response === "success") {
-                            document.getElementById("row-" + accountId).remove();
-                            let total = parseInt(document.getElementById("totalAccounts").innerText);
-                            document.getElementById("totalAccounts").innerText = total - 1;
-                        } else {
-                            alert("Error deleting account.");
-                        }
-                    }
-                });
+                window.location.href = "delete_account.php?id=" + accountId;
             }
         }
     </script>

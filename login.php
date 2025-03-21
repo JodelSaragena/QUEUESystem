@@ -6,45 +6,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
+    // Check if user exists in the tellers table
     $stmt = $conn->prepare("SELECT * FROM tellers WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            session_regenerate_id(true); 
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-            $redirects = [
-                'admin' => 'admindashboard.php',
-                'tellerwithdraw' => 'tellerwithdrawdashboard.php',
-                'tellerdeposit' => 'tellerdepositdashboard.php',
-                'telleropenaccount' => 'telleropenaccountdashboard.php',
-                'tellerdocumentation' => 'tellerdocumentationdashboard.php',
-                'tellercrewing' => 'tellercrewingdashboard.php',
-                'tellertechops' => 'tellertechopsdashboard.php',
-                'tellersourcing' => 'tellersourcingdashboard.php',
-                'tellertanker' => 'tellertankerdashboard.php',
-                'tellerwelfare' => 'tellerwelfaredashboard.php'
-            ];
-
-            if (isset($redirects[$_SESSION['role']])) {
-                header("Location: " . $redirects[$_SESSION['role']]);
-                exit();
-            } else {
-                echo "<script>alert('Invalid role'); window.location.href='login.php';</script>";
-            }
-            
-        } else {
-            echo "<script>alert('Incorrect password!'); window.location.href='login.php';</script>";
-        }
     } else {
         echo "<script>alert('User not found!'); window.location.href='login.php';</script>";
+        exit();
+    }
+
+    // Verify password
+    if (password_verify($password, $user['password'])) {
+        session_regenerate_id(true);
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = strtolower(trim($user['role']));
+        $_SESSION['department'] = strtolower(trim($user['department']));
+
+        // Redirect based on role and department
+        if ($_SESSION['role'] === 'admin') {
+            header("Location: admindashboard.php");
+            exit();
+        } elseif (in_array($_SESSION['role'], ['teller1', 'teller2', 'teller3'])) {
+            // Redirect tellers based on department
+            $department_dashboards = [
+                'admin' => 'admin_tellersdashboard.php',
+                'accounts' => 'accounts_tellersdashboard.php',
+                'documentation' => 'documentation_tellersdashboard.php',
+                'crewing' => 'crewing_tellersdashboard.php',
+                'techops' => 'techops_tellersdashboard.php',
+                'sourcing' => 'sourcing_tellersdashboard.php',
+                'tanker' => 'tanker_tellersdashboard.php',
+                'welfare' => 'welfare_tellersdashboard.php',
+            ];
+
+            $department = $_SESSION['department'];
+            if (isset($department_dashboards[$department])) {
+                header("Location: " . $department_dashboards[$department]);
+            } else {
+                header("Location: teller_dashboard.php"); // Default fallback
+            }
+            exit();
+        } else {
+            echo "<script>alert('Unauthorized role!'); window.location.href='login.php';</script>";
+        }
+    } else {
+        echo "<script>alert('Incorrect password!'); window.location.href='login.php';</script>";
     }
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            background:  #694F8E/*linear-gradient(to bottom, #E3A5C7, #694F8E)*/;
+            background:  #694F8E;
             height: 100vh;
             display: flex;
             justify-content: center;

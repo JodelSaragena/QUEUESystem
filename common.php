@@ -1,32 +1,58 @@
-<?php
+<?php     
 require 'db.php';
 
-// Get the currently serving numbers categorized by transaction type
-$transaction_types = ['withdrawal', 'deposit', 'open_account'];
-$serving_numbers = [];
-$next_numbers = [];
-$waiting_numbers = [];
+$departments = ['ADMIN', 'ACCOUNTS', 'DOCUMENTATION', 'CREWING', 'TECHOPS', 'SOURCING', 'TANKER', 'WELFARE'];
+$queue_data = [];
 
-foreach ($transaction_types as $type) {
-    // Get the currently serving number
-    $sql = "SELECT queue_number FROM queue WHERE status='serving' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 1";
+foreach ($departments as $department) {
+    // Fetch tellers for this department
+    $sql = "SELECT DISTINCT teller FROM queue WHERE department='$department' ORDER BY teller ASC";
     $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    $serving_numbers[$type] = $row ? $row['queue_number'] : 'None';
+    $tellers = [];
 
-    // Get the next number in line
-    $sql = "SELECT queue_number FROM queue WHERE status='waiting' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 1";
-    $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    $next_numbers[$type] = $row ? $row['queue_number'] : 'None';
-
-    // Get the first four waiting numbers
-    $sql = "SELECT queue_number FROM queue WHERE status='waiting' AND transaction_type='$type' ORDER BY queue_number ASC LIMIT 3";
-    $result = mysqli_query($conn, $sql);
-    $waiting_numbers[$type] = [];
     while ($row = mysqli_fetch_assoc($result)) {
-        $waiting_numbers[$type][] = $row['queue_number'];
+        $tellers[] = $row['teller'];
     }
+
+    // If no tellers found, set default values
+    $teller_display = !empty($tellers) ? implode(", ", $tellers) : 'No Tellers';
+
+    // Fetch the currently serving queue numbers for all tellers
+    $serving = [];
+    foreach ($tellers as $teller) {
+        $sql = "SELECT queue_number FROM queue WHERE status='Serving' AND department='$department' AND teller='$teller' ORDER BY queue_number ASC LIMIT 1";
+        $result = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $serving[$teller] = $row ? $row['queue_number'] : 'None';
+    }
+
+    // Fetch the next queue numbers for all tellers
+    $next = [];
+    foreach ($tellers as $teller) {
+        $sql = "SELECT queue_number FROM queue WHERE status='Waiting' AND department='$department' AND teller='$teller' ORDER BY queue_number ASC LIMIT 1";
+        $result = mysqli_query($conn, $sql);
+        $row = mysqli_fetch_assoc($result);
+        $next[$teller] = $row ? $row['queue_number'] : 'None';
+    }
+
+    // Fetch all waiting queue numbers
+    $sql = "SELECT queue_number FROM queue WHERE status='Waiting' AND department='$department' ORDER BY queue_number ASC";
+    $result = mysqli_query($conn, $sql);
+    
+    $waiting_list = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $waiting_list[] = $row['queue_number'];
+    }
+
+    // Limit the waiting list to 3 numbers
+    $waiting_list = array_slice($waiting_list, 0, 3);
+
+    $queue_data[$department] = [
+        'tellers' => $tellers,  // Array of tellers
+        'serving' => $serving,
+        'next' => $next,
+        'waiting' => $waiting_list
+    ];
 }
 
 mysqli_close($conn);
@@ -35,75 +61,50 @@ mysqli_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>TV Display</title>
+    <title>Queue Display</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Queue Display</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-       /* body {
-            background: linear-gradient(to bottom, #E3A5C7, #694F8E);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Poppins', sans-serif;
-            color: white;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             text-align: center;
-        }*/
-        .card {
-            width: 230px;
-            height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            padding: 20px;
         }
-        .card-header {
-            background-color: #433878;
-            color: white;
-            width: 100%;
+        .queue-table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
             text-align: center;
-            font-size: 1rem;
         }
-        .queue-box {
-            font-size: 3rem;
-            font-weight: bold;
-            color: black;
-        }
-        .waiting-box {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        .waiting-number {
+        th {
             background-color: #007bff;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
+        }
+        td {
+            font-size: 1rem;
             font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
         }
-        .transaction-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-        .transaction-label {
-            font-size: 1.5rem;
+        .waiting-list {
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-right: 15px;
-            white-space: nowrap;
+            color: #007bff;
         }
-        .arrow {
-            font-size: 2rem;
-            margin-right: 10px;
+        .none {
+            color: red;
         }
-        .row {
-            display: flex;
-            justify-content: center;
-            flex-wrap: nowrap;
+        .teller {
+            color: green;
         }
     </style>
     <script>
@@ -111,54 +112,64 @@ mysqli_close($conn);
     </script>
 </head>
 <body>
-    <div class="container mt-2">
-        <h2 class="text-center">Queue Display</h2>
-        
-        <?php foreach ($transaction_types as $type): ?>
-            <div class="transaction-row">
-                <div class="transaction-label"> <?php echo ucfirst($type); ?> </div>
-                <div class="arrow">→</div>
-                <div class="row">
-                    <div class="col-auto">
-                        <div class="card shadow-lg">
-                            <div class="card-header">
-                                <h5>Serving</h5>
-                            </div>
-                            <div class="card-body text-center serving">
-                                <h1 class="queue-box"> <?php echo $serving_numbers[$type]; ?> </h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="card shadow-lg">
-                            <div class="card-header">
-                                <h5>Next</h5>
-                            </div>
-                            <div class="card-body text-center next">
-                                <h1 class="queue-box"> <?php echo $next_numbers[$type]; ?> </h1>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <div class="card shadow-lg">
-                            <div class="card-header">
-                                <h5>Waiting</h5>
-                            </div>
-                            <div class="card-body text-center waiting">
-                                <div class="waiting-box">
-                                    <?php foreach ($waiting_numbers[$type] as $num): ?>
-                                        <div class="waiting-number"> <?php echo $num; ?> </div>
-                                    <?php endforeach; ?>
-                                    <?php if (empty($waiting_numbers[$type])): ?>
-                                        <div class="waiting-number">None</div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+<h2>Queue Display</h2>
+
+<table class="queue-table">
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>Tellers</th>
+            <th>Serving</th>
+            <th>Next</th>
+            <th>Waiting List</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($queue_data as $department => $data): ?>
+        <tr>
+            <td><?php echo ucfirst(strtolower($department)); ?></td>
+            <td>
+                <?php 
+                // Display each teller's name (e.g., Teller1) in vertical
+                foreach ($data['tellers'] as $index => $teller) {
+                    echo "<span>$teller</span><br>";
+                }
+                ?>
+            </td>
+            <td>
+                <?php 
+                // Display Serving queue number aligned with each teller
+                foreach ($data['tellers'] as $teller) {
+                    echo "<span>{$data['serving'][$teller]}</span><br>";
+                }
+                ?>
+            </td>
+            <td>
+                <?php 
+                // Display Next queue number aligned with each teller
+                foreach ($data['tellers'] as $teller) {
+                    echo "<span>{$data['next'][$teller]}</span><br>";
+                }
+                ?>
+            </td>
+            <td>
+                <?php if (!empty($data['waiting'])): ?>
+                    <?php 
+                    // Display the first 3 waiting numbers and show "More" if there are more
+                    echo implode("<br>", $data['waiting']);
+                    if (count($data['waiting']) > 3) {
+                        echo "<br><span class='none'>More...</span>";
+                    }
+                    ?>
+                <?php else: ?>
+                    <span class="none">None</span>
+                <?php endif; ?>
+            </td>
+        </tr>
         <?php endforeach; ?>
-    </div>
+    </tbody>
+</table>
+
 </body>
 </html>
