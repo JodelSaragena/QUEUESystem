@@ -44,7 +44,7 @@ $myQueue = $tellerQueues[$tellerIndex];
 <body>
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center">
-            <h2>Welcome, <?php echo $username; ?> (<?php echo ucfirst($tellerRole); ?>)</h2>
+            <h2>Welcome(<?php echo ucfirst($tellerRole); ?>)</h2>
             <!-- Logout Button -->
             <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
