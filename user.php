@@ -8,8 +8,6 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$today = date('Y-m-d');
-$department = "";
 $tellers = ['Teller1', 'Teller2', 'Teller3']; // Teller round-robin setup
 
 // Define prefixes
@@ -30,28 +28,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['department'], $_POST['
     }
 
     $department = $_POST['department'];
-    $prefix = isset($prefixes[$department]) ? $prefixes[$department] : 'X-';
+    $prefix = $prefixes[$department] ?? 'X-';
 
     if (!empty($department)) {
-        // Get the total queue count for the department today
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM queue WHERE department = ? AND date_generated = CURDATE()");
+        // 🚀 Lock the table to prevent race conditions
+        $conn->query("LOCK TABLES queue WRITE");
+
+        // ✅ Get the last queue number safely
+        $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE department = ? AND DATE(date_generated) = CURDATE() ORDER BY id DESC LIMIT 1");
         $stmt->bind_param("s", $department);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $stmt->close();
 
-        $new_queue_number = ($row['count'] ?? 0) + 1;  // Increment queue number
+        if ($row && isset($row['queue_number'])) {
+            preg_match('/\d+/', $row['queue_number'], $matches);
+            $last_queue_number = isset($matches[0]) ? intval($matches[0]) : 0;
+        } else {
+            $last_queue_number = 0;
+        }
+
+        // ✅ Properly increment queue number
+        $new_queue_number = $last_queue_number + 1;
         $formatted_queue_number = $prefix . $new_queue_number;
 
         // Assign a teller in round-robin manner
         $teller_index = ($new_queue_number - 1) % count($tellers);
         $assigned_teller = $tellers[$teller_index];
 
-        $stmt = $conn->prepare("INSERT INTO queue (queue_number, department, status, teller, date_generated) VALUES (?, ?, 'Waiting', ?, CURDATE())");
+        // 🚀 Insert into database
+        $stmt = $conn->prepare("INSERT INTO queue (queue_number, department, status, teller, date_generated) 
+                                VALUES (?, ?, 'Waiting', ?, CURDATE())");
         $stmt->bind_param("sss", $formatted_queue_number, $department, $assigned_teller);
         $stmt->execute();
         $stmt->close();
+
+        // 🚀 Unlock tables after insertion
+        $conn->query("UNLOCK TABLES");
 
         $_SESSION['queue_number'] = $formatted_queue_number;
 
@@ -75,6 +89,7 @@ if (isset($_SESSION['queue_number'])) {
 
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

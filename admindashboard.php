@@ -50,7 +50,7 @@ $conn->close();
                 <table class="table table-bordered">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
+                            <!--<th>ID</th>-->
                             <th>Username</th>
                             <th>Role</th>
                         </tr>
@@ -58,7 +58,7 @@ $conn->close();
                     <tbody>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo $row['id']; ?></td>
+                                <!--<td><?php echo $row['id']; ?></td>-->
                                 <td><?php echo $row['username']; ?></td>
                                 <td><?php echo ucfirst($row['role']); ?></td>
                             </tr>
