@@ -2,17 +2,17 @@
 session_start();
 include 'db.php';
 
-if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSION['department'])) {
+if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSION['services'])) {
     header("Location: login.php");
     exit();
 }
 
 $username = $_SESSION['username'];
 $tellerRole = $_SESSION['role']; // teller1, teller2, teller3
-$department = $_SESSION['department'];
+$services = $_SESSION['services'];
 
 // Get all queue numbers for this department that are NOT 'Done'
-$query = "SELECT * FROM queue WHERE department='$department' AND status != 'Done' ORDER BY id ASC";
+$query = "SELECT * FROM queue WHERE services='$services' AND status != 'Done' ORDER BY id ASC";
 $result = mysqli_query($conn, $query);
 
 // Fetch queue numbers into an array
@@ -38,7 +38,7 @@ $myQueue = $tellerQueues[$tellerIndex];
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title><?php echo $department; ?> Teller Dashboard</title>
+    <title><?php echo $services; ?> Teller Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -48,7 +48,7 @@ $myQueue = $tellerQueues[$tellerIndex];
             <!-- Logout Button -->
             <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
-        <h3>Department: <?php echo ucfirst($department); ?></h3>
+        <h3>Services: <?php echo ucfirst($services); ?></h3>
 
         <table class="table table-bordered mt-3">
             <thead>

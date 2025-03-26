@@ -8,7 +8,7 @@ $count_result = $count_query->fetch_assoc();
 $total_accounts = $count_result['total'];
 
 // Fetch all teller accounts
-$accounts_query = $conn->query("SELECT id, username, role, department FROM tellers");
+$accounts_query = $conn->query("SELECT id, username, role, services FROM tellers");
 $accounts = $accounts_query->fetch_all(MYSQLI_ASSOC);
 
 // Handle form submission
@@ -16,10 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
-    $department = $_POST['department'];
+    $services = $_POST['services'];
 
     // Validate inputs
-    if (empty($username) || empty($_POST['password']) || empty($role) || empty($department)) {
+    if (empty($username) || empty($_POST['password']) || empty($role) || empty($services)) {
         echo "<script>alert('All fields are required!'); window.location.href='createaccount.php';</script>";
         exit();
     }
@@ -36,12 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert new teller account
-    $stmt = $conn->prepare("INSERT INTO tellers (username, password, role, department) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO tellers (username, password, role, services) VALUES (?, ?, ?, ?)");
     if (!$stmt) {
         die("Prepare failed: " . $conn->error);
     }
 
-    $stmt->bind_param("ssss", $username, $password, $role, $department);
+    $stmt->bind_param("ssss", $username, $password, $role, $services);
     if ($stmt->execute()) {
         echo "<script>alert('Teller account created successfully!'); window.location.href='createaccount.php';</script>";
     } else {
@@ -89,8 +89,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Department:</label>
-                                <select name="department" class="form-select" required>
+                                <label class="form-label">Services:</label>
+                                <select name="services" class="form-select" required>
                                     <option value="ADMIN">Admin</option>
                                     <option value="ACCOUNTS">Accounts</option>
                                     <option value="DOCUMENTATION">Documentation</option>
@@ -136,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <tr>
                                 <th>Username</th>
                                 <th>Role</th>
-                                <th>Department</th>
+                                <th>Services</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -145,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <tr id="row-<?php echo $account['id']; ?>">
                                     <td><?php echo htmlspecialchars($account['username']); ?></td>
                                     <td><?php echo htmlspecialchars($account['role']); ?></td>
-                                    <td><?php echo htmlspecialchars($account['department']); ?></td>
+                                    <td><?php echo htmlspecialchars($account['services']); ?></td>
                                     <td>
                                         <?php if ($account['role'] !== 'admin') : ?>
                                             <button class="btn btn-danger btn-sm" onclick="deleteAccount(<?php echo $account['id']; ?>)">Delete</button>

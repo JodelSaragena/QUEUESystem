@@ -2,7 +2,7 @@
 session_start();
 include 'db.php';
 
-if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSION['department'])) {
+if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSION['services'])) {
     header("Location: login.php");
     exit();
 }

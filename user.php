@@ -22,21 +22,21 @@ $prefixes = [
     'WELFARE' => 'H-'
 ];
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['department'], $_POST['csrf_token'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['services'], $_POST['csrf_token'])) {
     if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         die("Invalid CSRF token.");
     }
 
-    $department = $_POST['department'];
-    $prefix = $prefixes[$department] ?? 'X-';
+    $services = $_POST['services'];
+    $prefix = $prefixes[$services] ?? 'X-';
 
-    if (!empty($department)) {
+    if (!empty($services)) {
         // 🚀 Lock the table to prevent race conditions
         $conn->query("LOCK TABLES queue WRITE");
 
         // ✅ Get the last queue number safely
-        $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE department = ? AND DATE(date_generated) = CURDATE() ORDER BY id DESC LIMIT 1");
-        $stmt->bind_param("s", $department);
+        $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE services = ? AND DATE(date_generated) = CURDATE() ORDER BY id DESC LIMIT 1");
+        $stmt->bind_param("s", $services);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
@@ -58,9 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['department'], $_POST['
         $assigned_teller = $tellers[$teller_index];
 
         // 🚀 Insert into database
-        $stmt = $conn->prepare("INSERT INTO queue (queue_number, department, status, teller, date_generated) 
+        $stmt = $conn->prepare("INSERT INTO queue (queue_number, services, status, teller, date_generated) 
                                 VALUES (?, ?, 'Waiting', ?, CURDATE())");
-        $stmt->bind_param("sss", $formatted_queue_number, $department, $assigned_teller);
+        $stmt->bind_param("sss", $formatted_queue_number, $services, $assigned_teller);
         $stmt->execute();
         $stmt->close();
 
@@ -102,6 +102,7 @@ $conn->close();
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
+            <a href="index.php" class="btn btn-primary ">Back</a>
                 <div class="card shadow-lg mt-4">
                     <div class="card-header text-center">
                         <h5>Generate Queue Number</h5>
@@ -110,7 +111,7 @@ $conn->close();
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
                             <?php foreach ($prefixes as $key => $prefix) : ?>
-                                <button type="submit" name="department" value="<?php echo $key; ?>" class="btn btn-primary m-1">
+                                <button type="submit" name="services" value="<?php echo $key; ?>" class="btn btn-primary m-1">
                                     <?php echo ucfirst(strtolower($key)); ?>
                                 </button>
                             <?php endforeach; ?>

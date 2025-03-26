@@ -24,15 +24,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         session_regenerate_id(true);
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = strtolower(trim($user['role']));
-        $_SESSION['department'] = strtolower(trim($user['department']));
+        $_SESSION['services'] = strtolower(trim($user['services']));
 
-        // Redirect based on role and department
+        // Redirect based on role and services
         if ($_SESSION['role'] === 'admin') {
             header("Location: admindashboard.php");
             exit();
         } elseif (in_array($_SESSION['role'], ['teller1', 'teller2', 'teller3'])) {
-            // Redirect tellers based on department
-            $department_dashboards = [
+            // Redirect tellers based on services
+            $services_dashboards = [
                 'admin' => 'admin_tellersdashboard.php',
                 'accounts' => 'accounts_tellersdashboard.php',
                 'documentation' => 'documentation_tellersdashboard.php',
@@ -43,9 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'welfare' => 'welfare_tellersdashboard.php',
             ];
 
-            $department = $_SESSION['department'];
-            if (isset($department_dashboards[$department])) {
-                header("Location: " . $department_dashboards[$department]);
+            $services = $_SESSION['services'];
+            if (isset($services_dashboards[$services])) {
+                header("Location: " . $services_dashboards[$services]);
             } else {
                 header("Location: teller_dashboard.php"); // Default fallback
             }
