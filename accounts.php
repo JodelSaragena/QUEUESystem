@@ -150,6 +150,7 @@ $conn->close();
                         <div class="mb-3">
                             <label for="role" class="form-label">Role</label>
                             <select name="role" id="role" class="form-select" required>
+                                <option value="tellerDocumentation">Teller Admin</option>
                                 <option value="tellerDocumentation">Teller Documentation</option>
                                 <option value="tellerCrewing">Teller Crewing</option>
                                 <option value="tellerTechOps">Teller TechOps</option>
