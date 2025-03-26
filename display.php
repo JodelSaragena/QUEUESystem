@@ -17,6 +17,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $queue_data[] = $row;
 }
 
+
 mysqli_close($conn);
 ?>
 
@@ -104,6 +105,38 @@ mysqli_close($conn);
     <script>
         setTimeout(function() { location.reload(); }, 5000);
     </script>
+    <script>
+    function announceNumber(queueNumber, teller) {
+        let msg = new SpeechSynthesisUtterance("Now serving queue number " + queueNumber + ". Please proceed to  " + teller);
+        msg.lang = "en-US";
+        msg.rate = 1; // Normal speed
+        window.speechSynthesis.speak(msg);
+    }
+
+    function checkForNewNumber() {
+        fetch('get_current_serving.php') // Fetch latest serving number
+            .then(response => response.json())
+            .then(data => {
+                console.log("Received Data:", data); // Debugging
+
+                if (data.queue_number && data.teller) {
+                    announceNumber(data.queue_number, data.teller);
+                } else {
+                    console.log("No active queue is being served.");
+                }
+            })
+            .catch(error => console.error("Error fetching queue data:", error));
+    }
+
+    setTimeout(function() { 
+        location.reload(); 
+    }, 5000); // Refresh every 5 seconds
+
+    checkForNewNumber(); // Check for new number
+</script>
+
+  
+
 </head>
 <body>
 

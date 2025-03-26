@@ -1,4 +1,5 @@
 <?php
+include 'sidebar.php';
 require 'db.php';
 session_start();
 
@@ -39,32 +40,6 @@ $yearTotal = $yearResult['total'] ?? 0;
             background-color: #F0F0F0;
         }
 
-        .sidebar {
-            width: 95px;
-            height: 100vh;
-            background-color: #433878;
-            color: white;
-            padding-top: 20px;
-            position: fixed;
-            text-align: center;
-        }
-
-        .sidebar a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            padding: 10px 5px;
-            transition: background 0.3s;
-            font-size: 0.70rem;
-        }
-
-        .sidebar a:hover {
-            background-color: #5a49a2;
-        }
-
         .main-content {
             margin-left: 110px;
             padding: 20px;
@@ -72,54 +47,30 @@ $yearTotal = $yearResult['total'] ?? 0;
         }
 
         .status-card {
-    background: white;
-    border-radius: 8px; /* Slightly smaller border radius */
-    padding: 8px; /* Reduced padding */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
-.status-card h5 {
-    font-size: 0.9rem; /* Smaller heading */
-    margin-bottom: 5px;
-}
+        .status-card h5 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
 
-.status-card p {
-    font-size: 1.2rem; /* Reduce number display size */
-    font-weight: bold;
-    margin: 0;
-}
+        .status-card p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+        }
 
-/* Adjust column spacing to keep it balanced */
-.col-md-4 {
-    padding: 5px;
-}
-
-
-        </style>
+        .col-md-4 {
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h4>Menu</h4>
-        <a href="admindashboard.php"><i class="bi bi-house-door"></i>Home</a>
-        <a href="user.php"><i class="bi bi-clipboard-plus"></i>Get Number</a>
-        <a href="login.php"><i class="bi bi-person-circle"></i>Teller Login</a>
-        <a href="display.php"><i class="bi bi-tv"></i>Display</a>
-        <a href="status.php"><i class="bi bi-bar-chart-fill"></i>Status</a>
-        <a href="accounts.php"><i class="bi bi-people"></i>Accounts</a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href="settings.php"><i class="bi bi-gear"></i>Settings</a>
-        <a href="logout.php" class="text-white"><i class="bi bi-box-arrow-right"></i>Logout</a>
-    </div>
 
     <div class="main-content">
         <h3>Queue Status Overview</h3>

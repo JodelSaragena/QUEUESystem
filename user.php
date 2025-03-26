@@ -69,7 +69,10 @@ $conn->close();
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card shadow">
-                    <div class="card-header text-center"><h6>Generate Queue Number</h6></div>
+                <div class="card-header text-center text-white" style="background-color: #433878;">
+                <h6>Generate Queue Number</h6>
+</div>
+
                     <div class="card-body">
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">

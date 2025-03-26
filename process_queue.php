@@ -30,8 +30,30 @@ if (mysqli_query($conn, $query)) {
     echo "<script>alert('Error updating queue: " . mysqli_error($conn) . "'); window.location.href='admin_tellersdashboard.php';</script>";
 }
 
-
-
-
 mysqli_close($conn);
+
+if (isset($_GET['id']) && isset($_GET['action'])) {
+    $id = $_GET['id'];
+    $action = $_GET['action'];
+
+    if ($action == "call") {
+        // Assign teller and set status to Serving
+        $teller = $_SESSION['role']; // Ensure the session contains the teller role
+        $updateQuery = "UPDATE queue SET status = 'Serving', teller = '$teller' WHERE id = '$id'";
+        mysqli_query($conn, $updateQuery);
+    } elseif ($action == "done") {
+        // Mark as Done
+        $updateQuery = "UPDATE queue SET status = 'Done' WHERE id = '$id'";
+        mysqli_query($conn, $updateQuery);
+    }
+}
+
+header("Location: admin_tellersdashboard.php");
+exit();
+
+
+
+
+
+
 ?>

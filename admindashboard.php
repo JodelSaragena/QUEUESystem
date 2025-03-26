@@ -1,4 +1,5 @@
 <?php
+include 'sidebar.php';
 require 'db.php';
 session_start();
 
@@ -41,32 +42,6 @@ while ($row = mysqli_fetch_assoc($result)) {
             background-color: #F0F0F0;
         }
 
-        .sidebar {
-            width: 95px;
-            height: 100vh;
-            background-color: #433878;
-            color: white;
-            padding-top: 20px;
-            position: fixed;
-            text-align: center;
-        }
-
-        .sidebar a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            padding: 10px 5px;
-            transition: background 0.3s;
-            font-size: 0.70rem;
-        }
-
-        .sidebar a:hover {
-            background-color: #5a49a2;
-        }
-
         .main-content {
             margin-left: 110px;
             padding: 20px;
@@ -82,52 +57,51 @@ while ($row = mysqli_fetch_assoc($result)) {
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h4>Menu</h4>
-        <a href="admindashboard.php"><i class="bi bi-house-door"></i>Home</a>
-        <a href="user.php"><i class="bi bi-clipboard-plus"></i>Get Number</a>
-        <a href="login.php"><i class="bi bi-person-circle"></i>Teller Login</a>
-        <a href="display.php"><i class="bi bi-tv"></i>Display</a>
-        <a href="status.php"><i class="bi bi-bar-chart-fill"></i>Status</a>
-        <a href="accounts.php"><i class="bi bi-people"></i>Accounts</a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href=""><i class=""></i></a>
-        <a href="settings.php"><i class="bi bi-gear"></i>Settings</a>
-        <a href="logout.php" class="text-white"><i class="bi bi-box-arrow-right"></i>Logout</a>
-    </div>
 
-    <div class="main-content">
-    <div class="row">
-        <?php foreach ($queues as $status => $queueList): ?>
-            <div class="col-md-4">
-                <div class="queue-card">
-                    <h5 class="text-capitalize"> <?= ucfirst($status) ?> </h5>
-                    <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
-                        <?php if (!empty($queueList)): ?>
-                            <?php foreach (array_slice($queueList, 0, 8) as $queue): ?>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><strong><?= $queue['queue_number'] ?></strong> - <?= $queue['services'] ?></span>
-                                    <span class="badge bg-primary"> <?= ucfirst($queue['status']) ?> </span>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <li class="list-group-item text-muted">No data available</li>
-                        <?php endif; ?>
-                    </ul>
+
+<div class="main-content">
+        <div class="container-fluid">
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+             <br>
+
+            <div class="mt-4"> 
+                <div class="row">
+                    <?php foreach ($queues as $status => $queueList): ?>
+                        <div class="col-md-4">
+                            <div class="queue-card">
+                                <h5 class="text-capitalize"> <?= ucfirst($status) ?> </h5>
+                                <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
+                                    <?php if (!empty($queueList)): ?>
+                                        <?php foreach (array_slice($queueList, 0, 8) as $queue): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span><strong><?= $queue['queue_number'] ?></strong> - <?= $queue['services'] ?></span>
+                                                <span class="badge bg-primary"> <?= ucfirst($queue['status']) ?> </span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <li class="list-group-item text-muted">No data available</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-        <?php endforeach; ?>
+        </div>
     </div>
-</div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
