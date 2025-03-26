@@ -7,20 +7,18 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Fetch queue data
-$query = "SELECT * FROM queue ORDER BY status ASC, queue_number ASC";
-$result = mysqli_query($conn, $query);
-$queues = ['Waiting' => [], 'Serving' => [], 'Done' => []];
+// Fetch total queue numbers
+$dayQuery = "SELECT COUNT(*) AS total FROM queue WHERE DATE(created_at) = CURDATE()";
+$monthQuery = "SELECT COUNT(*) AS total FROM queue WHERE MONTH(created_at) = MONTH(CURDATE())";
+$yearQuery = "SELECT COUNT(*) AS total FROM queue WHERE YEAR(created_at) = YEAR(CURDATE())";
 
-while ($row = mysqli_fetch_assoc($result)) {
-    if ($row['status'] == 'Waiting') {
-        $queues['Waiting'][] = $row;
-    } elseif ($row['status'] == 'Serving') {
-        $queues['Serving'][] = $row;
-    } else {
-        $queues['Done'][] = $row;
-    }
-}
+$dayResult = mysqli_fetch_assoc(mysqli_query($conn, $dayQuery));
+$monthResult = mysqli_fetch_assoc(mysqli_query($conn, $monthQuery));
+$yearResult = mysqli_fetch_assoc(mysqli_query($conn, $yearQuery));
+
+$dayTotal = $dayResult['total'] ?? 0;
+$monthTotal = $monthResult['total'] ?? 0;
+$yearTotal = $yearResult['total'] ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -28,14 +26,14 @@ while ($row = mysqli_fetch_assoc($result)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Status Overview</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <style>
         body {
             height: 100vh;
             display: flex;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;            
             font-size: smaller;
             color: black;
             background-color: #F0F0F0;
@@ -73,13 +71,32 @@ while ($row = mysqli_fetch_assoc($result)) {
             width: 100%;
         }
 
-        .queue-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+        .status-card {
+    background: white;
+    border-radius: 8px; /* Slightly smaller border radius */
+    padding: 8px; /* Reduced padding */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.status-card h5 {
+    font-size: 0.9rem; /* Smaller heading */
+    margin-bottom: 5px;
+}
+
+.status-card p {
+    font-size: 1.2rem; /* Reduce number display size */
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Adjust column spacing to keep it balanced */
+.col-md-4 {
+    padding: 5px;
+}
+
+
+        </style>
 </head>
 <body>
     <div class="sidebar">
@@ -99,35 +116,35 @@ while ($row = mysqli_fetch_assoc($result)) {
         <a href=""><i class=""></i></a>
         <a href=""><i class=""></i></a>
         <a href=""><i class=""></i></a>
+        <a href=""><i class=""></i></a>
         <a href="settings.php"><i class="bi bi-gear"></i>Settings</a>
         <a href="logout.php" class="text-white"><i class="bi bi-box-arrow-right"></i>Logout</a>
     </div>
 
     <div class="main-content">
-    <div class="row">
-        <?php foreach ($queues as $status => $queueList): ?>
+        <h3>Queue Status Overview</h3>
+        <div class="row mt-4">
             <div class="col-md-4">
-                <div class="queue-card">
-                    <h5 class="text-capitalize"> <?= ucfirst($status) ?> </h5>
-                    <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
-                        <?php if (!empty($queueList)): ?>
-                            <?php foreach (array_slice($queueList, 0, 8) as $queue): ?>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><strong><?= $queue['queue_number'] ?></strong> - <?= $queue['services'] ?></span>
-                                    <span class="badge bg-primary"> <?= ucfirst($queue['status']) ?> </span>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <li class="list-group-item text-muted">No data available</li>
-                        <?php endif; ?>
-                    </ul>
+                <div class="status-card">
+                    <h5>Today's Total</h5>
+                    <p class="display-6"> <?= $dayTotal ?> </p>
                 </div>
             </div>
-        <?php endforeach; ?>
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h5>This Month's Total</h5>
+                    <p class="display-6"> <?= $monthTotal ?> </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h5>This Year's Total</h5>
+                    <p class="display-6"> <?= $yearTotal ?> </p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

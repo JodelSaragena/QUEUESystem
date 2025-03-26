@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu</title>
+    <title>Index</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <style>
         body {
             height: 100vh;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             font-family: 'Poppins', sans-serif;
             font-size: smaller;
             color: black;
-            background-color: #F0F0F0; /* Light gray background */
-        }
-
-        .main-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
+            background-color: #F0F0F0;
+            padding-top: 20px;
         }
 
         .container {
@@ -58,16 +54,12 @@
     </style>
 </head>
 <body>
-
-    <div class="main-content">
-        <div class="container">
-            <div class="header">Welcome!!!</div>
-            <p class="mt-2">We are happy to serve you.</p>
-            <a href="user.php" class="btn btn-get-number">GET A NUMBER</a>
-        </div>
+    <div class="container">
+        <div class="header">Welcome!!!</div>
+        <p class="mt-2">We are happy to serve you.</p>
+        <a href="user.php" class="btn btn-get-number">GET A NUMBER</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

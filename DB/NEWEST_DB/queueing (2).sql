@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2025 at 06:18 AM
+-- Generation Time: Mar 26, 2025 at 03:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,61 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `documents`
---
-
-CREATE TABLE `documents` (
-  `id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `file_path` varchar(255) DEFAULT NULL,
-  `created_by` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `documents`
---
-
-INSERT INTO `documents` (`id`, `title`, `description`, `file_path`, `created_by`, `created_at`) VALUES
-(11, 'New', 'New', 'uploads/1741833817_NC.pdf', 'A_Doc', '2025-03-13 02:43:37');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `employees`
---
-
-CREATE TABLE `employees` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `gender` enum('Male','Female','Other') NOT NULL,
-  `age` int(11) NOT NULL,
-  `birthday` date NOT NULL,
-  `address` text NOT NULL,
-  `contact` varchar(50) NOT NULL,
-  `role` enum('admin','accounts','tellerwithdraw','tellerdeposit','telleropenaccount','tellerDocumentation','tellerCrewing','tellerTechOps','tellerSourcing','tellerTanker','tellerWelfare','teller1','teller2','teller3') NOT NULL,
-  `department` enum('ADMIN','ACCOUNTS','TELLERWITHDRAW','TELLERDEPOSIT','TELLEROPENACCOUNT','TELLERDOCUMENTATION','TELLERCREWING','TELLERTECHOPS','TELLERSOURCING','TELLERTANKER','TELLERWELFARE') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `employees`
---
-
-INSERT INTO `employees` (`id`, `name`, `gender`, `age`, `birthday`, `address`, `contact`, `role`, `department`, `created_at`) VALUES
-(1, 'Jodels Saragena', 'Female', 21, '2003-06-19', 'CEbu', '09238173730', 'tellerCrewing', 'ADMIN', '2025-03-13 07:40:35'),
-(2, 'JL', 'Male', 25, '1999-03-30', 'Minglanilla', '09876545678', 'tellerDocumentation', 'ADMIN', '2025-03-17 06:06:31'),
-(3, 'James', 'Male', 24, '1999-07-13', 'Pardo', '0964563463', 'tellerSourcing', 'ADMIN', '2025-03-17 06:07:26'),
-(4, 'Jade', 'Female', 35, '1980-09-23', 'Cebu', '09237234621472', 'admin', 'ADMIN', '2025-03-17 06:23:10'),
-(5, 'Brayan', 'Male', 25, '1999-03-30', 'Cebu', '098635138755', 'tellerwithdraw', 'ADMIN', '2025-03-17 06:45:02'),
-(6, 'Emma Pantz', 'Female', 25, '1999-03-30', 'Cebu', '098374613413', 'tellerdeposit', 'ADMIN', '2025-03-17 06:45:40'),
-(7, 'Timothy Do', 'Male', 25, '1999-03-30', 'CEbu', '09775722242', 'telleropenaccount', 'ADMIN', '2025-03-17 06:46:07'),
-(8, 'Blythe', 'Female', 25, '1999-03-30', 'Cev', '0967867547', 'tellerTanker', 'ADMIN', '2025-03-17 06:47:46');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `queue`
 --
 
@@ -89,7 +34,7 @@ CREATE TABLE `queue` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `date_generated` date NOT NULL DEFAULT curdate(),
-  `department` enum('ADMIN','ACCOUNTS','DOCUMENTATION','CREWING','TECHOPS','SOURCING','TANKER','WELFARE') NOT NULL,
+  `services` varchar(255) DEFAULT NULL,
   `teller` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -97,31 +42,8 @@ CREATE TABLE `queue` (
 -- Dumping data for table `queue`
 --
 
-INSERT INTO `queue` (`id`, `queue_number`, `status`, `created_at`, `updated_at`, `date_generated`, `department`, `teller`) VALUES
-(109, 'B-1', 'Waiting', '2025-03-25 05:13:54', '2025-03-25 05:13:54', '2025-03-25', 'ACCOUNTS', 'Teller1'),
-(110, 'A-1', 'Waiting', '2025-03-25 05:13:56', '2025-03-25 05:13:56', '2025-03-25', 'ADMIN', 'Teller1'),
-(111, 'A-2', 'Waiting', '2025-03-25 05:14:00', '2025-03-25 05:14:00', '2025-03-25', 'ADMIN', 'Teller2'),
-(112, 'B-2', 'Waiting', '2025-03-25 05:14:04', '2025-03-25 05:14:04', '2025-03-25', 'ACCOUNTS', 'Teller2'),
-(113, 'B-3', 'Waiting', '2025-03-25 05:14:20', '2025-03-25 05:14:20', '2025-03-25', 'ACCOUNTS', 'Teller3'),
-(114, 'C-1', 'Waiting', '2025-03-25 05:14:21', '2025-03-25 05:14:21', '2025-03-25', 'DOCUMENTATION', 'Teller1'),
-(115, 'D-1', 'Waiting', '2025-03-25 05:14:22', '2025-03-25 05:14:22', '2025-03-25', 'CREWING', 'Teller1'),
-(116, 'D-2', 'Waiting', '2025-03-25 05:14:23', '2025-03-25 05:14:23', '2025-03-25', 'CREWING', 'Teller2'),
-(117, 'E-1', 'Waiting', '2025-03-25 05:14:25', '2025-03-25 05:14:25', '2025-03-25', 'TECHOPS', 'Teller1'),
-(118, 'E-2', 'Waiting', '2025-03-25 05:14:25', '2025-03-25 05:14:25', '2025-03-25', 'TECHOPS', 'Teller2'),
-(119, 'F-1', 'Waiting', '2025-03-25 05:14:26', '2025-03-25 05:14:26', '2025-03-25', 'SOURCING', 'Teller1'),
-(120, 'F-2', 'Waiting', '2025-03-25 05:14:27', '2025-03-25 05:14:27', '2025-03-25', 'SOURCING', 'Teller2'),
-(121, 'G-1', 'Waiting', '2025-03-25 05:14:27', '2025-03-25 05:14:27', '2025-03-25', 'TANKER', 'Teller1'),
-(122, 'H-1', 'Waiting', '2025-03-25 05:14:28', '2025-03-25 05:14:28', '2025-03-25', 'WELFARE', 'Teller1'),
-(123, 'H-2', 'Waiting', '2025-03-25 05:14:51', '2025-03-25 05:14:51', '2025-03-25', 'WELFARE', 'Teller2'),
-(124, 'G-2', 'Waiting', '2025-03-25 05:14:52', '2025-03-25 05:14:52', '2025-03-25', 'TANKER', 'Teller2'),
-(125, 'G-3', 'Waiting', '2025-03-25 05:14:53', '2025-03-25 05:14:53', '2025-03-25', 'TANKER', 'Teller3'),
-(126, 'H-3', 'Waiting', '2025-03-25 05:14:53', '2025-03-25 05:14:53', '2025-03-25', 'WELFARE', 'Teller3'),
-(127, 'F-3', 'Waiting', '2025-03-25 05:14:54', '2025-03-25 05:14:54', '2025-03-25', 'SOURCING', 'Teller3'),
-(128, 'D-3', 'Waiting', '2025-03-25 05:14:55', '2025-03-25 05:14:55', '2025-03-25', 'CREWING', 'Teller3'),
-(129, 'E-3', 'Waiting', '2025-03-25 05:14:56', '2025-03-25 05:14:56', '2025-03-25', 'TECHOPS', 'Teller3'),
-(130, 'C-2', 'Waiting', '2025-03-25 05:15:05', '2025-03-25 05:15:05', '2025-03-25', 'DOCUMENTATION', 'Teller2'),
-(131, 'C-3', 'Waiting', '2025-03-25 05:15:07', '2025-03-25 05:15:07', '2025-03-25', 'DOCUMENTATION', 'Teller3'),
-(132, 'A-3', 'Waiting', '2025-03-25 05:16:51', '2025-03-25 05:16:51', '2025-03-25', 'ADMIN', 'Teller3');
+INSERT INTO `queue` (`id`, `queue_number`, `status`, `created_at`, `updated_at`, `date_generated`, `services`, `teller`) VALUES
+(141, 'A-1', 'Waiting', '2025-03-25 06:31:47', '2025-03-25 06:31:47', '2025-03-25', 'ADMIN', 'Teller1');
 
 -- --------------------------------------------------------
 
@@ -134,7 +56,7 @@ CREATE TABLE `tellers` (
   `username` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('admin','teller1','teller2','teller3') NOT NULL,
-  `department` enum('ADMIN','ACCOUNTS','DOCUMENTATION','CREWING','TECHOPS','SOURCING','TANKER','WELFARE') NOT NULL,
+  `services` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -142,7 +64,7 @@ CREATE TABLE `tellers` (
 -- Dumping data for table `tellers`
 --
 
-INSERT INTO `tellers` (`id`, `username`, `password`, `role`, `department`, `created_at`) VALUES
+INSERT INTO `tellers` (`id`, `username`, `password`, `role`, `services`, `created_at`) VALUES
 (1, 'admin', '$2y$10$HtS9qzyc2plCN3.1NfyKH.aedZbCpIpDPsv8s.6qMZCvaO42b75qq', 'admin', 'ADMIN', '2025-03-21 05:11:22'),
 (2, 'Admin_Teller1', '$2y$10$CgMOe3r.LwjAH/.NQkU/K.7FRlVUmCXMPgRpzjUxDimIX03oEugNC', 'teller1', 'ADMIN', '2025-03-21 05:12:51'),
 (3, 'Admin_Teller2', '$2y$10$XIE94bnIJbkonMleqCp/DeK5ia/MbV1TyQAQT2rzQxhEOsDa1fx66', 'teller2', 'ADMIN', '2025-03-21 05:14:06'),
@@ -174,18 +96,6 @@ INSERT INTO `tellers` (`id`, `username`, `password`, `role`, `department`, `crea
 --
 
 --
--- Indexes for table `documents`
---
-ALTER TABLE `documents`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `employees`
---
-ALTER TABLE `employees`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `queue`
 --
 ALTER TABLE `queue`
@@ -208,22 +118,10 @@ ALTER TABLE `tellers`
 --
 
 --
--- AUTO_INCREMENT for table `documents`
---
-ALTER TABLE `documents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
---
--- AUTO_INCREMENT for table `employees`
---
-ALTER TABLE `employees`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
 -- AUTO_INCREMENT for table `queue`
 --
 ALTER TABLE `queue`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
 
 --
 -- AUTO_INCREMENT for table `tellers`

@@ -1,10 +1,16 @@
 <?php      
 require 'db.php';
 
-$departments = ['ADMIN', 'ACCOUNTS', 'DOCUMENTATION', 'CREWING', 'TECHOPS', 'SOURCING', 'TANKER', 'WELFARE'];
 $queue_data = [];
 
-$sql = "SELECT queue_number, teller, services FROM queue WHERE status IN ('Waiting', 'Serving') ORDER BY queue_number ASC";
+// Fetch all queue numbers, but only display tellers for "Serving" status
+$sql = "SELECT queue_number, 
+               CASE WHEN status = 'Serving' THEN teller ELSE '' END AS teller, 
+               services 
+        FROM queue 
+        WHERE status IN ('Waiting', 'Serving') 
+        ORDER BY queue_number ASC";
+
 $result = mysqli_query($conn, $sql);
 
 while ($row = mysqli_fetch_assoc($result)) {
@@ -21,41 +27,78 @@ mysqli_close($conn);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f8f9fa;
             text-align: center;
             padding: 20px;
         }
-        .queue-table {
-            width: 90%;
+        .container {
+            max-width: 800px;
             margin: auto;
-            border-collapse: collapse;
             background: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .sub-text {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
+            padding: 12px 15px;
         }
         th {
-            background-color: #007bff;
-            color: white;
             font-size: 1.1rem;
+            border-bottom: 2px solid #e0e0e0;
+            color: #333;
         }
         td {
+            text-transform: uppercase;
             font-size: 1rem;
             font-weight: bold;
         }
-        .none {
-            color: red;
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        /* Column alignments */
+        th:nth-child(1), td.queue-number {
+            text-align: left; /* Queue No. - Left aligned */
+        }
+        th:nth-child(2), td.teller {
+            text-align: center; /* Teller - Center aligned */
+        }
+        th:nth-child(3), td.services {
+            text-align: right; /* Services - Right aligned */
+        }
+        /* Styling for better readability */
+        .queue-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color:black;
         }
         .teller {
-            color: green;
+            font-weight: bold;
+            color:black;
+        }
+        .services {
+            font-weight: bold;
+            color: #343a40;
         }
     </style>
     <script>
@@ -64,26 +107,33 @@ mysqli_close($conn);
 </head>
 <body>
 
-<h2>Queue Display</h2>
+<div class="container">
+    <h2>Waitlist</h2>
+    <p class="sub-text"><?php echo count($queue_data); ?> </p>
 
-<table class="queue-table">
-    <thead>
-        <tr>
-            <th>Queue No.</th>
-            <th>Teller</th>
-            <th>Department</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($queue_data as $data): ?>
-        <tr>
-            <td><?php echo $data['queue_number']; ?></td>
-            <td><?php echo $data['teller']; ?></td>
-            <td><?php echo ucfirst(strtolower($data['services'])); ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Queue No.</th>
+                <th>Teller</th>
+                <th>Services</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($queue_data)): ?>
+                <?php foreach ($queue_data as $data): ?>
+                <tr>
+                    <td class="queue-number"><?php echo $data['queue_number']; ?></td>
+                    <td class="teller"><?php echo !empty($data['teller']) ? ucfirst(strtolower($data['teller'])) : '—'; ?></td>
+                    <td class="services"><?php echo ucfirst(strtolower($data['services'])); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="3">No active queues</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 </body>
 </html>
