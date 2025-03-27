@@ -9,6 +9,7 @@ $sql = "SELECT queue_number,
                services 
         FROM queue 
         WHERE status IN ('Waiting', 'Serving') 
+        AND DATE(created_at) = CURDATE()  -- Only fetch today's queue numbers
         ORDER BY queue_number ASC";
 
 $result = mysqli_query($conn, $sql);

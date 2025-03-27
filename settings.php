@@ -21,8 +21,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         body {
             height: 100vh;
             display: flex;
-            font-family: 'Poppins', Arial, sans-serif;            
-            font-size: smaller;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 14px;
             color: black;
             background-color: #F0F0F0;
         }
@@ -31,24 +31,65 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
             margin-left: 110px;
             padding: 20px;
             width: 100%;
+            max-width: 600px;
         }
 
-        .card {
+        .settings-card {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 15px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+
+        .settings-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item span {
+            font-size: 13px;
+            color: gray;
+        }
+
+        .icon {
+            font-size: 18px;
+            color: black;
         }
     </style>
 </head>
 <body>
 
-
     <div class="main-content">
         <h3>Settings</h3>
-        <div class="card mt-4">
-            <h5>System Settings</h5>
-            <p>Add your settings options here.</p>
+        <div class="settings-card mt-4">
+            <a href="services.php" class="settings-item">
+                <div>
+                    <strong>Services</strong><br>
+                    <span>Create and manage your services.</span>
+                </div>
+                <i class="bi bi-chevron-right icon"></i>
+            </a>
+            <a href="resources.php" class="settings-item">
+                <div>
+                    <strong>Resources</strong><br>
+                    <span>Create and manage your resources.</span>
+                </div>
+                <i class="bi bi-chevron-right icon"></i>
+            </a>
         </div>
     </div>
 

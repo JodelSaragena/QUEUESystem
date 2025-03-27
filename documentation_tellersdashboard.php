@@ -12,7 +12,12 @@ $tellerRole = $_SESSION['role']; // teller1, teller2, teller3
 $services = $_SESSION['services'];
 
 // Get queue numbers assigned to this teller that are NOT 'Done'
-$query = "SELECT * FROM queue WHERE services='$services' AND teller='$tellerRole' AND status != 'Done' ORDER BY id ASC";
+$query = "SELECT * FROM queue 
+          WHERE services='$services' 
+          AND teller='$tellerRole' 
+          AND status != 'Done' 
+          AND DATE(created_at) = CURDATE()  -- Only today's queue numbers
+          ORDER BY id ASC";
 $result = mysqli_query($conn, $query);
 
 // Fetch queue numbers
