@@ -58,7 +58,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                             <td><?php echo $row['status']; ?></td>
                             <td>
                                 <?php if ($row['status'] == 'Waiting') { ?>
-                                    <a href="documentation_process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Call Next</a>
+                                    <a href="documentation_process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Serve</a>
                                 <?php } elseif ($row['status'] == 'Serving') { ?>
                                     <a href="documentation_process_queue.php?id=<?php echo $row['id']; ?>&action=done" class="btn btn-success">Done</a>
                                 <?php } ?>

@@ -32,6 +32,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
             height: 100vh;
@@ -57,51 +58,35 @@ while ($row = mysqli_fetch_assoc($result)) {
     </style>
 </head>
 <body>
-
-
-<div class="main-content">
-        <div class="container-fluid">
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-             <br>
-
-            <div class="mt-4"> 
-                <div class="row">
-                    <?php foreach ($queues as $status => $queueList): ?>
-                        <div class="col-md-4">
-                            <div class="queue-card">
-                                <h5 class="text-capitalize"> <?= ucfirst($status) ?> </h5>
-                                <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
-                                    <?php if (!empty($queueList)): ?>
-                                        <?php foreach (array_slice($queueList, 0, 8) as $queue): ?>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                <span><strong><?= $queue['queue_number'] ?></strong> - <?= $queue['services'] ?></span>
-                                                <span class="badge bg-primary"> <?= ucfirst($queue['status']) ?> </span>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <li class="list-group-item text-muted">No data available</li>
-                                    <?php endif; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+    <div class="main-content">
+    <div class="row">
+        <?php foreach ($queues as $status => $queueList): ?>
+            <div class="col-md-4">
+                <div class="queue-card">
+                    <h5 class="text-capitalize"> <?= ucfirst($status) ?> </h5>
+                    <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
+                        <?php if (!empty($queueList)): ?>
+                            <?php foreach (array_slice($queueList, 0, 8) as $queue): ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong><?= $queue['queue_number'] ?></strong> - <?= $queue['services'] ?></span>
+                                    <span class="badge bg-primary"> <?= ucfirst($queue['status']) ?> </span>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li class="list-group-item text-muted">No data available</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
-        </div>
+        <?php endforeach; ?>
     </div>
+</div>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+
+
