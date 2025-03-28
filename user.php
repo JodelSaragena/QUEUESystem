@@ -126,7 +126,7 @@ $conn->close();
                     </div>
                     <div class="card-body text-center">
                         <?php if ($user_queue): ?>
-                            <h2 id="queueNumberPrint" style="font-size: 8rem;"> <?php echo $user_queue['queue_number']; ?> </h2>
+                            <h3 id="queueNumberPrint" style="font-size: 8rem;"> <?php echo $user_queue['queue_number']; ?></h3>
                             <p><strong>Status:</strong> <?php echo ucfirst($user_queue['status']); ?></p>
                             <p><strong>Teller:</strong> <?php echo $user_queue['teller']; ?></p>
                         <?php else: ?>
@@ -144,6 +144,7 @@ $conn->close();
         var printWindow = window.open('', '', 'width=400,height=600');
         printWindow.document.write('<html><head><title>Print Queue</title></head><body>');
         printWindow.document.write('<h2 style="text-align: center;">Queue Number</h2>');
+        //printWindow.document.write('<h2 style="text-align: center;">Codeit Inc.</h2>');
         printWindow.document.write('<h1 style="text-align: center; font-size: 5rem;">' + queueNumber + '</h1>');
         printWindow.document.write('<p style="text-align: center; font-size: 1.2rem;">Teller: <strong>' + tellerName + '</strong></p>');
         printWindow.document.write('</body></html>');

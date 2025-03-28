@@ -90,6 +90,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
                 </div>
                 <i class="bi bi-chevron-right icon"></i>
             </a>
+            <a href="resources.php" class="settings-item"></>
+               
         </div>
     </div>
 
