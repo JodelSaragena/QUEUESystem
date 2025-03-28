@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Hash password securely
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
+// hmm
     // Prevent duplicate usernames
     $check_query = $conn->prepare("SELECT id FROM tellers WHERE username = ?");
     $check_query->bind_param("s", $username);
