@@ -1,4 +1,4 @@
-<?php  
+<?php   
 include 'sidebar.php'; 
 session_start();
 require 'db.php'; // Ensure this connects to your database
@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Hash password securely
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-// hmm
+
     // Prevent duplicate usernames
     $check_query = $conn->prepare("SELECT id FROM tellers WHERE username = ?");
     $check_query->bind_param("s", $username);
@@ -68,114 +68,103 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-family: 'Poppins', Arial, sans-serif;
         }
         .card-body form .form-label {
-        font-size: 14px; /* Reduce label size */
-    }
-
-    .card-body form .form-control, 
-    .card-body form .form-select {
-        font-size: 14px; /* Smaller input text */
-        padding: 6px 10px; /* Adjust padding for a compact look */
-    }
-
-    .btn-primary {
-        font-size: 14px; /* Smaller button text */
-        padding: 7px 10px; /* Adjust button size */
-    }
-
-
-        </style>
+            font-size: 14px;
+        }
+        .card-body form .form-control, 
+        .card-body form .form-select {
+            font-size: 14px;
+            padding: 6px 10px;
+        }
+        .btn-primary {
+            font-size: 14px;
+            padding: 7px 10px;
+        }
+        .card-body.scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-3">
-    <div class="container mt-3">
-    <h4>Create Account</h4>
-    <div class="row g-3"> <!-- Adds spacing between columns -->
-        <!-- Create Account Form -->
-        <div class="col-md-5 d-flex"> <!-- Flexbox ensures equal height alignment -->
-            <div class="card shadow w-100">
-                <div class="card-header text-center"><strong>Create New Teller Account</strong></div>
-                <div class="card-body">
-                    <form method="POST" action="accounts.php">
-                        <div class="mb-3">
-                            <label class="form-label">Username:</label>
-                            <input type="text" name="username" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password:</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Role:</label>
-                            <select name="role" class="form-select" required>
-                                <option value="admin">Admin</option>    
-                                <option value="teller1">Teller 1</option>
-                                <option value="teller2">Teller 2</option>
-                                <option value="teller3">Teller 3</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Services:</label>
-                            <select name="services" class="form-select" required>
-                                <option value="ADMIN">Admin</option>
-                                <option value="ACCOUNTS">Accounts</option>
-                                <option value="DOCUMENTATION">Documentation</option>
-                                <option value="CREWING">Crewing</option>
-                                <option value="TECHOPS">Tech Ops</option>
-                                <option value="SOURCING">Sourcing</option>
-                                <option value="TANKER">Tanker</option>
-                                <option value="WELFARE">Welfare</option>
-                            </select>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Create Account</button>
-                        </div>
-                    </form>
+        <div class="row">
+            <h4>Create Account</h4>
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-header text-center">Create New Teller Account</div>
+                    <div class="card-body">
+                        <form method="POST" action="accounts.php">
+                            <div class="mb-3">
+                                <label class="form-label">Username:</label>
+                                <input type="text" name="username" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Password:</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role:</label>
+                                <select name="role" class="form-select" required>
+                                    <option value="admin">Admin</option>    
+                                    <option value="teller1">Teller 1</option>
+                                    <option value="teller2">Teller 2</option>
+                                    <option value="teller3">Teller 3</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Services:</label>
+                                <select name="services" class="form-select" required>
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="ACCOUNTS">Accounts</option>
+                                    <option value="DOCUMENTATION">Documentation</option>
+                                    <option value="CREWING">Crewing</option>
+                                    <option value="TECHOPS">Tech Ops</option>
+                                    <option value="SOURCING">Sourcing</option>
+                                    <option value="TANKER">Tanker</option>
+                                    <option value="WELFARE">Welfare</option>
+                                </select>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Create Account</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Accounts List -->
-        <div class="col-md-7 d-flex"> <!-- Ensures equal height with flexbox -->
-            <div class="card shadow w-100">
-                <div class="card-header text-center"><strong>Total Accounts Created:</strong> <?php echo $total_accounts; ?></div>
-                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table table-bordered table-sm text-center" style="table-layout: fixed; width: 100%;">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 25%;">Username</th>
-                                <th style="width: 20%;">Role</th>
-                                <th style="width: 35%;">Services</th>
-                                <th style="width: 20%;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $counter = 0;
-                            foreach ($accounts as $account) :
-                                if ($counter >= 10) break; // Limit display to 10 accounts
-                            ?>
+            <div class="col-md-7">
+                <h4>Accounts</h4>
+                <div class="card shadow">
+                    <div class="card-header text-center">Total Accounts Created: <?php echo $total_accounts; ?></div>
+                    <div class="card-body scrollable">
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($account['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($account['role']); ?></td>
-                                    <td><?php echo htmlspecialchars($account['services']); ?></td>
-                                    <td>
-                                        <?php if ($account['role'] !== 'admin') : ?>
-                                            <button class="btn btn-danger btn-sm" onclick="deleteAccount(<?php echo $account['id']; ?>)">Delete</button>
-                                        <?php endif; ?>
-                                    </td>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Services</th>
+                                    <th>Action</th>
                                 </tr>
-                            <?php 
-                                $counter++;
-                            endforeach; 
-                            ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($accounts as $account) : ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($account['username']); ?></td>
+                                        <td><?php echo htmlspecialchars($account['role']); ?></td>
+                                        <td><?php echo htmlspecialchars($account['services']); ?></td>
+                                        <td>
+                                            <?php if ($account['role'] !== 'admin') : ?>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteAccount(<?php echo $account['id']; ?>)">Delete</button>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
     <script>
         function deleteAccount(accountId) {
             if (confirm("Are you sure you want to delete this account?")) {
