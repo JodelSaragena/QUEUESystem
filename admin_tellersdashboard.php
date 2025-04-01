@@ -8,16 +8,15 @@ if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSI
 }
 
 $username = $_SESSION['username'];
-$tellerRole = $_SESSION['role']; // teller1, teller2, teller3
 $services = $_SESSION['services'];
 
 // Get queue numbers assigned to this teller that are NOT 'Done'
 $query = "SELECT * FROM queue 
-          WHERE services='$services' 
-          AND teller='$tellerRole' 
+          WHERE services='$services'  
           AND status != 'Done' 
-          AND DATE(created_at) = CURDATE()  -- Only today's queue numbers
+          AND DATE(created_at) = CURDATE()  
           ORDER BY id ASC";
+
 $result = mysqli_query($conn, $query);
 
 // Fetch queue numbers
@@ -43,8 +42,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 <body>
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center">
-            <h2>Welcome (<?php echo ucfirst($tellerRole); ?>)</h2>
-            <a href="logout.php" class="btn btn-danger">Logout</a>
+        <h2>Welcome (<?php echo ucfirst($_SESSION['role']); ?>)</h2>
+        <a href="logout.php" class="btn btn-danger">Logout</a>
         </div>
         <h3>Services: <?php echo ucfirst($services); ?></h3>
 
@@ -63,11 +62,12 @@ while ($row = mysqli_fetch_assoc($result)) {
                             <td><?php echo $row['queue_number']; ?></td>
                             <td><?php echo $row['status']; ?></td>
                             <td>
-                                <?php if ($row['status'] == 'Waiting') { ?>
-                                    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Serve</a>
-                                <?php } elseif ($row['status'] == 'Serving') { ?>
-                                    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=done" class="btn btn-success">Done</a>
-                                <?php } ?>
+                            <?php if ($row['status'] == 'Waiting') { ?>
+    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Serve</a>
+<?php } elseif ($row['status'] == 'Serving' && $row['teller'] == $_SESSION['role']) { ?>
+    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=done" class="btn btn-success">Done</a>
+<?php } ?>
+
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -78,4 +78,4 @@ while ($row = mysqli_fetch_assoc($result)) {
         </table>
     </div>
 </body>
-</html> 
+</html>

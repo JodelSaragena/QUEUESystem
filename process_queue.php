@@ -14,10 +14,28 @@ if (!isset($_GET['id']) || !isset($_GET['action'])) {
 
 $id = intval($_GET['id']);
 $action = $_GET['action'];
+$teller = $_SESSION['role']; // Get the teller role (teller1, teller2, or teller3)
+
+// Fetch the current queue status and assigned teller
+$query = "SELECT * FROM queue WHERE id = $id";
+$result = mysqli_query($conn, $query);
+$row = mysqli_fetch_assoc($result);
+
+if (!$row) {
+    echo "<script>alert('Queue not found!'); window.location.href='admin_tellersdashboard.php';</script>";
+    exit();
+}
 
 if ($action == 'call') {
-    $query = "UPDATE queue SET status = 'Serving' WHERE id = $id";
+    // Assign the teller role and set status to "Serving"
+    $query = "UPDATE queue SET status = 'Serving', teller = '$teller' WHERE id = $id";
 } elseif ($action == 'done') {
+    // Ensure that the teller who is serving the queue can mark it as done
+    if ($row['teller'] !== $teller) {
+        echo "<script>alert('You are not authorized to mark this queue as Done.'); window.location.href='admin_tellersdashboard.php';</script>";
+        exit();
+    }
+    // Mark as "Done" but keep the teller info
     $query = "UPDATE queue SET status = 'Done' WHERE id = $id";
 } else {
     echo "<script>alert('Invalid action!'); window.location.href='admin_tellersdashboard.php';</script>";
@@ -31,29 +49,4 @@ if (mysqli_query($conn, $query)) {
 }
 
 mysqli_close($conn);
-
-if (isset($_GET['id']) && isset($_GET['action'])) {
-    $id = $_GET['id'];
-    $action = $_GET['action'];
-
-    if ($action == "call") {
-        // Assign teller and set status to Serving
-        $teller = $_SESSION['role']; // Ensure the session contains the teller role
-        $updateQuery = "UPDATE queue SET status = 'Serving', teller = '$teller' WHERE id = '$id'";
-        mysqli_query($conn, $updateQuery);
-    } elseif ($action == "done") {
-        // Mark as Done
-        $updateQuery = "UPDATE queue SET status = 'Done' WHERE id = '$id'";
-        mysqli_query($conn, $updateQuery);
-    }
-}
-
-header("Location: admin_tellersdashboard.php");
-exit();
-
-
-
-
-
-
 ?>

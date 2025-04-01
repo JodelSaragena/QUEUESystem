@@ -4,7 +4,7 @@ session_start();
 require 'db.php'; // Ensure this connects to your database
 
 // Count total accounts created
-$count_query = $conn->query("SELECT COUNT(*) as total FROM tellers");
+$count_query = $conn->query(query: "SELECT COUNT(*) as total FROM tellers");
 $count_result = $count_query->fetch_assoc();
 $total_accounts = $count_result['total'];
 
