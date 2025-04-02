@@ -10,7 +10,7 @@ if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || !isset($_SESSI
 $username = $_SESSION['username'];
 $services = $_SESSION['services'];
 
-// Get queue numbers assigned to this teller that are NOT 'Done'
+// Get queue numbers to this teller that are NOT 'Done'
 $query = "SELECT * FROM queue 
           WHERE services='$services'  
           AND status != 'Done' 
@@ -37,6 +37,7 @@ while ($row = mysqli_fetch_assoc($result)) {
             font-family: 'Poppins', Arial, sans-serif;
         }
     </style> 
+
 </head>
 
 <body>
@@ -63,10 +64,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                             <td><?php echo $row['status']; ?></td>
                             <td>
                             <?php if ($row['status'] == 'Waiting') { ?>
-    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Serve</a>
-<?php } elseif ($row['status'] == 'Serving' && $row['teller'] == $_SESSION['role']) { ?>
-    <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=done" class="btn btn-success">Done</a>
-<?php } ?>
+                                <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=call" class="btn btn-primary">Serve</a>
+                            <?php } elseif ($row['status'] == 'Serving' && $row['teller'] == $_SESSION['role']) { ?>
+                                <a href="process_queue.php?id=<?php echo $row['id']; ?>&action=done" class="btn btn-success">Done</a>
+                            <?php } ?>
 
                             </td>
                         </tr>

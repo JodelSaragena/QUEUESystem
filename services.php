@@ -128,22 +128,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_service"])) {
                     <span><?php echo htmlspecialchars($row["services"]); ?></span>
                     <form method="POST" style="display:inline;">
                         <input type="hidden" name="service_name" value="<?php echo htmlspecialchars($row["services"]); ?>">
-                        <!--<button type="submit" name="delete_service" class="btn btn-sm btn-danger">Delete</button>-->
+                        <button type="submit" name="delete_service" class="btn btn-sm btn-danger">Delete</button>
                     </form>
                 </div>
             <?php endwhile; ?>
         </div>
 
         <!-- Add New Service -->
-        <div class="card add-service-card">
+       <!-- <div class="card add-service-card">
             <h6>Add New Service</h6>
             <form method="POST" class="form-inline">
                 <input type="text" name="service_name" class="form-control" placeholder="Enter service name" required>
-                <!--<button type="submit" name="add_service" class="btn btn-primary">Add</button>-->
+                <button type="submit" name="add_service" class="btn btn-primary">Add</button>
             </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html>-->

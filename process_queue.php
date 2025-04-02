@@ -14,7 +14,7 @@ if (!isset($_GET['id']) || !isset($_GET['action'])) {
 
 $id = intval($_GET['id']);
 $action = $_GET['action'];
-$teller = $_SESSION['role']; // Get the teller role (teller1, teller2, or teller3)
+$teller = $_SESSION['role']; // Get the teller role
 
 // Fetch the current queue status and assigned teller
 $query = "SELECT * FROM queue WHERE id = $id";

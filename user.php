@@ -3,7 +3,6 @@ require 'db.php';
 session_start();
 date_default_timezone_set('Asia/Manila'); 
 
-// Ensure CSRF token is generated only once per session
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -14,7 +13,6 @@ $prefixes = [
     'TANKER' => 'G-', 'WELFARE' => 'H-'
 ];
 
-// Handle queue generation
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['services'], $_POST['csrf_token'])) {
     // Secure CSRF token validation
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
@@ -27,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['services'], $_POST['cs
     if (!empty($services)) {
         $conn->query("LOCK TABLES queue WRITE");
 
-        // Get the last queue number for the selected service
+        //last queue number for the selected service
         $stmt = $conn->prepare("SELECT queue_number FROM queue WHERE services = ? AND DATE(date_generated) = CURDATE() ORDER BY id DESC LIMIT 1");
         $stmt->bind_param("s", $services);
         $stmt->execute();
@@ -38,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['services'], $_POST['cs
         $last_queue_number = isset($row['queue_number']) ? intval(preg_replace('/\D/', '', $row['queue_number'])) : 0;
         $formatted_queue_number = $prefix . ($last_queue_number + 1);
         
-        // Insert the new queue number without assigning a teller
+        // Insert the new queue number 
         $stmt = $conn->prepare("INSERT INTO queue (queue_number, services, status, date_generated) VALUES (?, ?, 'Waiting', CURDATE())");
         $stmt->bind_param("ss", $formatted_queue_number, $services);
         $stmt->execute();
@@ -48,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['services'], $_POST['cs
 
         $_SESSION['queue_number'] = $formatted_queue_number;
 
-        // Regenerate CSRF token after successful form submission
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         header("Location: user.php");
@@ -123,3 +120,4 @@ $conn->close();
     </div>
 </body>
 </html>
+

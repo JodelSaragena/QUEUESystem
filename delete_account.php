@@ -17,13 +17,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
-    echo "<script>alert('Account not found.'); window.location.href='createaccount.php';</script>";
+    echo "<script>alert('Account not found.'); window.location.href='accounts.php';</script>";
     exit();
 }
 
 $account = $result->fetch_assoc();
 if ($account['role'] === 'admin') {
-    echo "<script>alert('Admin accounts cannot be deleted.'); window.location.href='createaccount.php';</script>";
+    echo "<script>alert('Admin accounts cannot be deleted.'); window.location.href='accounts.php';</script>";
     exit();
 }
 
@@ -32,8 +32,8 @@ $delete_stmt = $conn->prepare("DELETE FROM tellers WHERE id = ?");
 $delete_stmt->bind_param("i", $id);
 
 if ($delete_stmt->execute()) {
-    echo "<script>alert('Account deleted successfully.'); window.location.href='createaccount.php';</script>";
+    echo "<script>alert('Account deleted successfully.'); window.location.href='accounts.php';</script>";
 } else {
-    echo "<script>alert('Error deleting account.'); window.location.href='createaccount.php';</script>";
+    echo "<script>alert('Error deleting account.'); window.location.href='accounts.php';</script>";
 }
 ?>

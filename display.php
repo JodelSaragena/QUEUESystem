@@ -78,17 +78,15 @@ mysqli_close($conn);
         tbody tr:last-child {
             border-bottom: none;
         }
-        /* Column alignments */
         th:nth-child(1), td.queue-number {
-            text-align: left; /* Queue No. - Left aligned */
+            text-align: left; 
         }
         th:nth-child(2), td.teller {
-            text-align: center; /* Teller - Center aligned */
+            text-align: center;
         }
         th:nth-child(3), td.services {
-            text-align: right; /* Services - Right aligned */
+            text-align: right;
         }
-        /* Styling for better readability */
         .queue-number {
             font-weight: bold;
             font-size: 1.1rem;
