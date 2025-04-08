@@ -22,15 +22,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verify password
     if (password_verify($password, $user['password'])) {
         session_regenerate_id(true);
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = strtolower(trim($user['role']));
-        $_SESSION['services'] = strtolower(trim($user['services']));
+        
+        // Generate a unique dashboard key for session isolation
+        $dashboardKey = uniqid('dashboard_');
+        
+        // Store session data per dashboard key
+        $_SESSION[$dashboardKey] = [
+            'username' => $user['username'],
+            'role' => strtolower(trim($user['role'])),
+            'services' => strtolower(trim($user['services']))
+        ];
 
         // Redirect based on role and services
-        if ($_SESSION['role'] === 'admin') {
-            header("Location: admindashboard.php");
+        if ($_SESSION[$dashboardKey]['role'] === 'admin') {
+            header("Location: admindashboard.php?dashboard=$dashboardKey");
             exit();
-        } elseif (in_array($_SESSION['role'], ['teller1', 'teller2', 'teller3'])) {
+        } elseif (in_array($_SESSION[$dashboardKey]['role'], ['teller1', 'teller2', 'teller3'])) {
             // Redirect tellers based on services
             $services_dashboards = [
                 'admin' => 'admin_tellersdashboard.php',
@@ -43,11 +50,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'welfare' => 'welfare_tellersdashboard.php',
             ];
 
-            $services = $_SESSION['services'];
+            $services = $_SESSION[$dashboardKey]['services'];
             if (isset($services_dashboards[$services])) {
-                header("Location: " . $services_dashboards[$services]);
+                header("Location: " . $services_dashboards[$services] . "?dashboard=$dashboardKey");
             } else {
-                header("Location: teller_dashboard.php"); // Default fallback
+                header("Location: teller_dashboard.php?dashboard=$dashboardKey"); // Default fallback
             }
             exit();
         } else {
@@ -57,9 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<script>alert('Incorrect password!'); window.location.href='login.php';</script>";
     }
 }
-
-
-
 ?>
 
 <!DOCTYPE html>

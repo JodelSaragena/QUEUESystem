@@ -103,18 +103,49 @@ $conn->close();
                 </div>
 
                 <div class="card shadow mt-3">
-                    <div class="card-header">
-                        <h6>Your Queue</h6>
-                    </div>
-                    <div class="card-body text-center">
-                        <?php if ($user_queue): ?>
-                            <h3 id="queueNumberPrint" style="font-size: 8rem;"> <?php echo $user_queue['queue_number']; ?></h3>
-                            <p><strong>Status:</strong> <?php echo ucfirst($user_queue['status']); ?></p>
-                        <?php else: ?>
-                            <p class="alert alert-secondary">You have not joined the queue yet.</p>
-                        <?php endif; ?>
-                    </div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6>Your Queue</h6>
+                    <?php if ($user_queue): ?>
+                        <button class="btn btn-sm btn-primary" onclick="printQueueNumber()">🖨Print Number</button>
+                    <?php endif; ?>
                 </div>
+                <div class="card-body text-center">
+                    <?php if ($user_queue): ?>
+                        <h3 id="queueNumberPrint" style="font-size: 8rem;"> <?php echo $user_queue['queue_number']; ?></h3>
+                    <?php else: ?>
+                        <p class="alert alert-secondary">You have not joined the queue yet.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <script>
+    function printQueueNumber() {
+        let printWindow = window.open('', '', 'width=400,height=600');
+        
+        let queueNumber = document.getElementById("queueNumberPrint").innerText;
+        
+        // Get current date and time
+        let currentDate = new Date();
+        let date = (currentDate.getMonth() + 1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear().toString().slice(-2);
+        let time = currentDate.getHours() % 12 || 12;
+        let minutes = currentDate.getMinutes().toString().padStart(2, '0');
+        let period = currentDate.getHours() < 12 ? 'AM' : 'PM';
+        let timeString = time + ':' + minutes + ' ' + period;
+
+        printWindow.document.write(`<html><head><title>Queue Number</title></head><body style="text-align:center;font-family:Arial, sans-serif;">`); 
+        printWindow.document.write(`<p>Queue Number</p>`);
+        printWindow.document.write(`<h1 style="font-size:5rem;">${queueNumber}</h1>`);
+        printWindow.document.write(`<p>Thank you for waiting!</p>`);
+        printWindow.document.write(`<p>${date}, ${timeString}</p>`);
+        printWindow.document.write(`</body></html>`);
+        printWindow.document.close();
+        printWindow.print();
+    }
+</script>
+
+
+
+
             </div>
         </div>
     </div>

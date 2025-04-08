@@ -3,7 +3,13 @@ include 'sidebar.php';
 require 'db.php';
 session_start();
 
+// Debugging: Check session role
+ //var_dump($_SESSION['role']); // Uncomment this for debugging
+ //exit(); // Uncomment this to stop the script
+
+// Check if the user is logged in and if the role is 'admin'
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    // Redirect to login page if the session role is not set or not admin
     header("Location: login.php");
     exit();
 }
@@ -181,30 +187,29 @@ $colors = ['#433878', '#6AB04C', '#FF7979', '#F9CA24', '#1E90FF', '#8E44AD', '#E
 
     <script>
     const ctx = document.getElementById('serviceChart').getContext('2d');
-new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: <?= json_encode($labels) ?>,
-        datasets: [{
-            data: <?= json_encode($serviceData) ?>,
-            backgroundColor: [
-                '#433878', '#6AB04C', '#FF7979', '#F9CA24',
-                '#1E90FF', '#8E44AD', '#E67E22', '#95A5A6'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false // This removes the legend
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                data: <?= json_encode($serviceData) ?>,
+                backgroundColor: [
+                    '#433878', '#6AB04C', '#FF7979', '#F9CA24',
+                    '#1E90FF', '#8E44AD', '#E67E22', '#95A5A6'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // This removes the legend
+                }
             }
         }
-    }
-});
-
+    });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -104,35 +104,38 @@ mysqli_close($conn);
     <script>
         setTimeout(function() { location.reload(); }, 5000);
     </script>
-    <script>
-    function announceNumber(queueNumber, teller) {
-        let msg = new SpeechSynthesisUtterance("Now serving queue number " + queueNumber + ". Please proceed to  " + teller);
-        msg.lang = "en-US";
-        msg.rate = 1; // Normal speed
-        window.speechSynthesis.speak(msg);
-    }
+     <!-- SOUND EFFECT -->
+     <audio id="dingSound" src="sounds/ding.mp3" preload="auto"></audio>
 
-    function checkForNewNumber() {
-        fetch('get_current_serving.php') // Fetch latest serving number
-            .then(response => response.json())
-            .then(data => {
-                console.log("Received Data:", data); // Debugging
+     <script>
+        const audio = document.getElementById("dingSound");
 
-                if (data.queue_number && data.teller) {
-                    announceNumber(data.queue_number, data.teller);
-                } else {
-                    console.log("No active queue is being served.");
-                }
-            })
-            .catch(error => console.error("Error fetching queue data:", error));
-    }
+        function playDing() {
+            if (audio) {
+                audio.play();
+            }
+        }
 
-    setTimeout(function() { 
-        location.reload(); 
-    }, 5000); // Refresh every 5 seconds
+        function checkForNewServe() {
+            fetch("get_current_serving.php")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.queue_number) {
+                        const lastServed = localStorage.getItem("lastServedNumber");
+                        if (lastServed !== data.queue_number) {
+                            // New serving number detected
+                            playDing();
+                            localStorage.setItem("lastServedNumber", data.queue_number);
+                        }
+                    }
+                })
+                .catch(err => console.error("Error checking serve:", err));
+        }
 
-    checkForNewNumber(); // Check for new number
-</script>
+        setInterval(checkForNewServe, 3000); // check every 3 seconds
+    </script>
+
+
 
   
 

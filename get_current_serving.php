@@ -1,11 +1,13 @@
 <?php
 require 'db.php';
 
+header('Content-Type: application/json');
+
 $sql = "SELECT queue_number, teller FROM queue WHERE status = 'Serving' ORDER BY id DESC LIMIT 1";
 $result = mysqli_query($conn, $sql);
-$row = mysqli_fetch_assoc($result);
 
-if ($row) {
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
     echo json_encode([
         'queue_number' => $row['queue_number'],
         'teller' => $row['teller']
