@@ -81,7 +81,7 @@ $conn->close();
             <div class="col-md-6">
                 <div class="card shadow">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <a href="admindashboard.php" class="btn btn-light btn-sm">&lt;</a>
+                        <!--<a href="admindashboard.php" class="btn btn-light btn-sm">&lt;</a>-->
                         <h6 class="flex-grow-1 text-center m-0">Generate Queue Number</h6>
                         <div style="width: 32px;"></div>
                     </div>
@@ -119,28 +119,72 @@ $conn->close();
             </div>
 
             <script>
-    function printQueueNumber() {
-        let printWindow = window.open('', '', 'width=400,height=600');
-        
-        let queueNumber = document.getElementById("queueNumberPrint").innerText;
-        
-        // Get current date and time
-        let currentDate = new Date();
-        let date = (currentDate.getMonth() + 1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear().toString().slice(-2);
-        let time = currentDate.getHours() % 12 || 12;
-        let minutes = currentDate.getMinutes().toString().padStart(2, '0');
-        let period = currentDate.getHours() < 12 ? 'AM' : 'PM';
-        let timeString = time + ':' + minutes + ' ' + period;
+   function printQueueNumber() {
+    const printWindow = window.open('', '', 'width=600,height=800');
+    
+    const queueNumber = document.getElementById("queueNumberPrint").innerText;
+    
+    const currentDate = new Date();
+    const date = (currentDate.getMonth() + 1) + '/' + currentDate.getDate() + '/' + currentDate.getFullYear().toString().slice(-2);
+    const time = currentDate.getHours() % 12 || 12;
+    const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+    const period = currentDate.getHours() < 12 ? 'AM' : 'PM';
+    const timeString = time + ':' + minutes + ' ' + period;
 
-        printWindow.document.write(`<html><head><title>Queue Number</title></head><body style="text-align:center;font-family:Arial, sans-serif;">`); 
-        printWindow.document.write(`<p>Queue Number</p>`);
-        printWindow.document.write(`<h1 style="font-size:5rem;">${queueNumber}</h1>`);
-        printWindow.document.write(`<p>Thank you for waiting!</p>`);
-        printWindow.document.write(`<p>${date}, ${timeString}</p>`);
-        printWindow.document.write(`</body></html>`);
-        printWindow.document.close();
-        printWindow.print();
-    }
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Queue Number</title>
+            <style>
+                @media print {
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                    }
+                    .print-container {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100vw;
+                        height: 100vh;
+                        page-break-inside: avoid;
+                        text-align: center;
+                        box-sizing: border-box;
+                        padding: 0;
+                        font-family: Arial, sans-serif;
+                    }
+                    .queue {
+                        font-size: 30vw; /* auto-scales based on width */
+                        line-height: 1;
+                        margin: 0;
+                    }
+                    .subtext {
+                        font-size: 3vw;
+                        margin-top: 20px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="print-container">
+                <div class="subtext">Queue Number</div>
+                <div class="queue">${queueNumber}</div>
+                <div class="subtext">Thank you for waiting!</div>
+                <div class="subtext">${date}, ${timeString}</div>
+            </div>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+}
+
+
 </script>
 
 

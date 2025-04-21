@@ -36,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Redirect based on role and services
         if ($_SESSION[$dashboardKey]['role'] === 'admin') {
             header("Location: admindashboard.php?dashboard=$dashboardKey");
+            
             exit();
         } elseif (in_array($_SESSION[$dashboardKey]['role'], ['teller1', 'teller2', 'teller3'])) {
             // Redirect tellers based on services
@@ -75,15 +76,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
         body {
-            background:  #694F8E;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Poppins', sans-serif;
-            color: white;
-            text-align: center;
-        }
+        background: #003092;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Poppins', sans-serif;
+        color: white;
+        text-align: center;
+    }
+
 
         .container {
             display: flex;
@@ -142,7 +144,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container">
         <div class="glass-container">
-            <h2 class="text-white text-start">Teller/Admin Login</h2>
+            <h2 class="text-white text-start">Admin | Teller Login</h2>
             <form method="POST" action="login.php">
                 <div class="mb-3 text-start">
                     <label for="username" class="form-label text-white">Username</label>

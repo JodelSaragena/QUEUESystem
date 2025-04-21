@@ -1,5 +1,5 @@
 <?php   
-include 'sidebar.php'; 
+ 
 session_start();
 require 'db.php'; // Ensure this connects to your database
 
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check_result = $check_query->get_result();
 
     if ($check_result->num_rows > 0) {
-        echo "<script>alert('Username already exists!'); window.location.href='accounts.php';</script>";
+        echo "<script>alert('Username already exists!'); window.location.href='admindashboard.php?dashboard=" . $_GET['dashboard'] . "';</script>";
         exit();
     }
 

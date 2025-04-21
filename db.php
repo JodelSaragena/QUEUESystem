@@ -1,6 +1,6 @@
 <?php
 $host = "localhost"; 
-$dbname = "queueing"; 
+$dbname = "queue"; 
 $username = "root";  
 $password = "";       
 

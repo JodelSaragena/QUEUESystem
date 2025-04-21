@@ -1,21 +1,28 @@
 <div class="queue-card">
-        <h3>Settings</h3>
+    <h3>Settings</h3>
+    <div class="container mt-4 p-4 bg-light border rounded shadow">
+    <div class="queue-card">
+
         <div class="settings-card mt-4">
-            <a href="services.php" class="settings-item">
+            <a href="#" class="settings-item" onclick="loadContent('services.php')">
                 <div>
-                    <strong>Services</strong><br>
-                    <span>Create and manage your services.</span>
+                    <strong class="bi bi-chevron-right icon">Services</strong><br>
+                   <!-- <i class="bi bi-chevron-right icon"></i>-->
+                   <!-- <span>Create and manage your services.</span>-->
                 </div>
-                <i class="bi bi-chevron-right icon"></i>
+                
             </a>
-            <a href="resources.php" class="settings-item">
+            <a href="#" class="settings-item" onclick="loadContent('resources.php')">
                 <div>
-                    <strong>Resources</strong><br>
-                    <span>Create and manage your resources.</span>
+                    <strong i class="bi bi-chevron-right icon">Resources</strong><br>
+                    <!--<i class="bi bi-chevron-right icon"></i>-->
+                    <!--<span>Create and manage your resources.</span> -->
                 </div>
-                <i class="bi bi-chevron-right icon"></i>
+                
             </a>
-            <a href="resources.php" class="settings-item"></>
-               
         </div>
     </div>
+</div>
+
+
+</div>
