@@ -125,72 +125,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
-    <div class="container">
+<div class="container">
+    <div class="row g-4 mb-4">
+        <!-- Left Side: Queue Status (50%) -->
+        <div class="col-md-6">
+    <h4 class="text-primary"><i class="bi bi-card-checklist"></i> Queue Status</h4>
 
-        <h4 class="text-primary"><i class="bi bi-card-checklist"></i> Queue Status</h4>
-        <div class="row g-4 mb-4">
-            <div class="col-md-4"><div class="queue-card p-3"><h6 class="text-center">Waiting</h6><ul class="list-group queue-waiting"></ul></div></div>
-            <div class="col-md-4"><div class="queue-card p-3"><h6 class="text-center">Serving</h6><ul class="list-group queue-serving"></ul></div></div>
-            <div class="col-md-4"><div class="queue-card p-3"><h6 class="text-center">Done</h6><ul class="list-group queue-done"></ul></div></div>
-        </div>
-
-
-
-        <h4 class="text-primary"><i class="bi bi-bar-chart-line"></i> Status Overview</h4>
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="status-card p-3 text-center">
-            <h6>Today</h6>
-            <p><?= $dayTotal ?></p>
-        </div>
+    <!-- Waiting Queue -->
+    <div class="queue-card p-3 mb-3" style="max-height: 250px; overflow-y: auto;">
+        <h6 class="text-center">Waiting</h6>
+        <ul class="list-group queue-waiting">
+            <!-- Example list items -->
+            <li class="list-group-item">Waiting 1</li>
+            <li class="list-group-item">Waiting 2</li>
+            <li class="list-group-item">Waiting 3</li>
+            <li class="list-group-item">Waiting 4</li>
+            <li class="list-group-item">Waiting 5</li>
+            <li class="list-group-item">Waiting 6</li>
+        </ul>
     </div>
-    <div class="col-md-3">
-        <div class="status-card p-3 text-center">
-            <h6>This Week</h6>
-            <p><?= $weekTotal ?></p>
-        </div>
+
+    <!-- Serving Queue -->
+    <div class="queue-card p-3 mb-3" style="max-height: 250px; overflow-y: auto;">
+        <h6 class="text-center">Serving</h6>
+        <ul class="list-group queue-serving">
+            <!-- Example list items -->
+            <li class="list-group-item">Serving 1</li>
+            <li class="list-group-item">Serving 2</li>
+            <li class="list-group-item">Serving 3</li>
+            <li class="list-group-item">Serving 4</li>
+            <li class="list-group-item">Serving 5</li>
+            <li class="list-group-item">Serving 6</li>
+        </ul>
     </div>
-    <div class="col-md-3">
-        <div class="status-card p-3 text-center">
-            <h6>This Month</h6>
-            <p><?= $monthTotal ?></p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="status-card p-3 text-center">
-            <h6>This Year</h6>
-            <p><?= $yearTotal ?></p>
-        </div>
+
+    <!-- Done Queue -->
+    <div class="queue-card p-3" style="max-height: 250px; overflow-y: auto;">
+        <h6 class="text-center">Done</h6>
+        <ul class="list-group queue-done">
+            <!-- Example list items -->
+            <li class="list-group-item">Done 1</li>
+            <li class="list-group-item">Done 2</li>
+            <li class="list-group-item">Done 3</li>
+            <li class="list-group-item">Done 4</li>
+            <li class="list-group-item">Done 5</li>
+            <li class="list-group-item">Done 6</li>
+        </ul>
     </div>
 </div>
 
 
+        <!-- Right Side: Status Overview + Service Overview (50%) -->
+        <div class="col-md-6">
+            <!-- Status Overview -->
+            <h4 class="text-primary"><i class="bi bi-bar-chart-line"></i> Status Overview</h4>
+            <div class="row g-3 mb-4">
+                <div class="col-3">
+                    <div class="status-card p-3 text-center">
+                        <h6>Today</h6>
+                        <p><?= $dayTotal ?></p>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="status-card p-3 text-center">
+                        <h6>This Week</h6>
+                        <p><?= $weekTotal ?></p>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="status-card p-3 text-center">
+                        <h6>This Month</h6>
+                        <p><?= $monthTotal ?></p>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="status-card p-3 text-center">
+                        <h6>This Year</h6>
+                        <p><?= $yearTotal ?></p>
+                    </div>
+                </div>
+            </div>
 
-<h4 class="text-primary"><i class="bi bi-pie-chart"></i> Service Overview</h4>
-<div class="row mb-4">
-    <div class="col-md-7 mx-auto">
-        <div class="card p-3">
-            <div class="row">
-                <!-- Service Breakdown List (Left Side) -->
-                <div class="col-md-6">
-                    <div style="width: 100%;">
+            <!-- Service Overview -->
+            <h4 class="text-primary"><i class="bi bi-pie-chart"></i> Service Overview</h4>
+            <div class="card p-3">
+                <div class="row">
+                    <!-- Service Breakdown List -->
+                    <div class="col-6">
                         <ul class="list-group list-group-flush">
                             <?php foreach ($labels as $index => $label): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center py-1 px-2 small">
                                     <?= htmlspecialchars($label); ?>
                                     <span>
-                                        <span class="badge rounded-pill" style="background-color: <?= $colors[$index % count($colors)]; ?>; width: 12px; height: 12px; display: inline-block; margin-right: 10px;"></span>
+                                        <span class="badge rounded-pill"
+                                              style="background-color: <?= $colors[$index % count($colors)]; ?>; width: 12px; height: 12px; display: inline-block; margin-right: 10px;"></span>
                                         <?= $serviceData[$index]; ?>
                                     </span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
-                </div>
 
-                <!-- Pie Chart (Right Side) -->
-                <div class="col-md-5 d-flex justify-content-center align-items-center">
-                    <canvas id="serviceChart" height="150"></canvas>
+                    <!-- Chart -->
+                    <div class="col-6 d-flex justify-content-center align-items-center">
+                        <canvas id="serviceChart" height="150"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -199,9 +238,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
+<hr class="my-5">
+<h4 class="text-primary"><i class="bi bi-people-fill"></i>Account Management</h4>
 
-
-        <h4 class="text-primary"><i class="bi bi-person-plus"></i> Manage Accounts</h4>
 <div class="row g-4 mb-4">
     <div class="col-md-6">
         <div class="card shadow">
